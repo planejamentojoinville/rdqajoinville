@@ -5,12 +5,20 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Painel Relatório DigiSUS - Prefeitura de Joinville</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f9; color: #2d3748; margin: 0; padding: 15px; }
     .container { max-width: 98%; margin: 0 auto; }
     .header { background: linear-gradient(135deg, #004577 0%, #005691 100%); padding: 18px 25px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; color: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
     .header h3 { margin: 0; color: #ffffff; font-size: 1.4em; }
     .header span { font-size: 0.85em; color: #d0e4f7; }
+
+    .header-actions { display: flex; gap: 8px; }
+    .btn-header { padding: 8px 12px; border-radius: 5px; border: none; font-weight: bold; font-size: 0.82em; cursor: pointer; color: white; display: flex; align-items: center; gap: 5px; }
+    .btn-add { background-color: #d97706; } .btn-add:hover { background-color: #b45309; }
+    .btn-exp { background-color: #059669; } .btn-exp:hover { background-color: #047857; }
+    .btn-imp { background-color: #6d28d9; } .btn-imp:hover { background-color: #5b21b6; }
+    .btn-del { background-color: #dc2626; } .btn-del:hover { background-color: #b91c1c; }
 
     .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 20px; }
     .kpi-card { background: #ffffff; padding: 15px 20px; border-radius: 8px; border: 1px solid #e2e8f0; border-left: 5px solid #005691; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
@@ -20,16 +28,14 @@
 
     .card { background: #ffffff; padding: 20px; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; }
     .card-title { color: #005691; margin-top: 0; margin-bottom: 15px; font-size: 1.15em; border-bottom: 2px solid #005691; padding-bottom: 8px; font-weight: bold; }
-    
+
     .filter-bar { background: #ebf3f9; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; display: flex; align-items: center; gap: 15px; flex-wrap: wrap; border: 1px solid #cce0f1; }
     .filter-item { display: flex; align-items: center; gap: 8px; }
     .filter-bar label { font-size: 0.9em; font-weight: bold; color: #004577; }
     .filter-bar select { background: #ffffff; color: #004577; border: 1px solid #005691; padding: 6px 12px; border-radius: 4px; font-weight: 500; }
-    
-    .btn-export { background: #0f9d58; color: #ffffff; border: none; padding: 7px 14px; border-radius: 4px; cursor: pointer; font-size: 0.85em; font-weight: bold; display: flex; align-items: center; gap: 6px; transition: background 0.2s; }
-    .btn-export:hover { background: #0b8043; }
-    .btn-export-docs { background: #4285f4; color: #ffffff; border: none; padding: 7px 14px; border-radius: 4px; cursor: pointer; font-size: 0.85em; font-weight: bold; display: flex; align-items: center; gap: 6px; transition: background 0.2s; }
-    .btn-export-docs:hover { background: #3367d6; }
+
+    .btn-export { background: #0f9d58; color: #ffffff; border: none; padding: 7px 14px; border-radius: 4px; cursor: pointer; font-size: 0.85em; font-weight: bold; }
+    .btn-export-docs { background: #4285f4; color: #ffffff; border: none; padding: 7px 14px; border-radius: 4px; cursor: pointer; font-size: 0.85em; font-weight: bold; }
 
     table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88em; margin-bottom: 15px; }
     th, td { padding: 9px 12px; border: 1px solid #cbd5e0; }
@@ -37,16 +43,46 @@
     tr.clickable-row { cursor: pointer; transition: background 0.2s; }
     tr.clickable-row:hover { background-color: #e8f4fd; }
     tr.selected-row { background-color: #bee3f8 !important; font-weight: bold; color: #003358; }
-    
+
     .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
     @media (max-width: 900px) { .charts-grid { grid-template-columns: 1fr; } }
-    
+
     .chart-box { background: #ffffff; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0; height: 330px; position: relative; display: flex; flex-direction: column; align-items: center; }
     .chart-box h5 { margin: 0 0 10px 0; color: #005691; font-size: 0.88em; text-align: center; font-weight: bold; }
     .chart-container { position: relative; width: 100%; height: 100%; }
 
     .btn-clear-filter { background: #e53e3e; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8em; margin-left: auto; font-weight: bold; }
     h5 { color: #004577; }
+
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 9999; }
+    .modal-content { background: #2d3748; color: #f7fafc; padding: 25px; border-radius: 10px; width: 500px; max-width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+    .modal-content h3 { margin-top: 0; color: #f6ad55; border-bottom: 1px solid #4a5568; padding-bottom: 10px; }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; font-size: 0.85em; font-weight: bold; margin-bottom: 5px; color: #cbd5e0; }
+    .form-group input, .form-group select { width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #4a5568; background: #1a202c; color: #fff; box-sizing: border-box; }
+    .form-row { display: flex; gap: 10px; }
+    .modal-section { border-top: 1px dashed #4a5568; padding-top: 10px; margin-top: 15px; }
+    .modal-section-title { font-size: 0.9em; font-weight: bold; color: #f6ad55; margin-bottom: 8px; }
+    .status-msg { font-size: 0.8em; color: #68d391; margin-top: 4px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
+    .btn-save { background: #38a169; color: white; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; }
+    .btn-cancel { background: #718096; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; }
+
+    /* ESTILOS DA AMPULHETA */
+    @keyframes girar {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .icone-ampulheta {
+      display: inline-block;
+      animation: girar 1.5s infinite linear;
+      margin-right: 5px;
+    }
+    .status-carregando {
+      font-size: 0.8em;
+      color: #f6ad55;
+      margin-top: 4px;
+    }
   </style>
 </head>
 <body>
@@ -56,6 +92,13 @@
     <div>
       <h3>Capítulo 4 (DigiSUS) - Prefeitura de Joinville</h3>
       <span>Relatório Consolidado de Produção da Saúde</span>
+    </div>
+    <div class="header-actions">
+      <button class="btn-header btn-add" onclick="abrirModal()">📂 Add Quadri</button>
+      <button class="btn-header btn-exp" onclick="exportarJSON()">📤 Exportar JSON</button>
+      <button class="btn-header btn-imp" onclick="document.getElementById('inputImportJSON').click()">📥 Importar JSON</button>
+      <input type="file" id="inputImportJSON" style="display:none" accept=".json" onchange="importarJSON(event)">
+      <button class="btn-header btn-del" onclick="limparBancoData()">🗑️ Limpar</button>
     </div>
   </div>
 
@@ -85,18 +128,12 @@
   <div class="filter-bar">
     <div class="filter-item">
       <label>Estabelecimento:</label>
-      <select id="filtroEstabelecimento" onchange="renderizarTudo()">
-        <option value="TODOS">Todos os Estabelecimentos</option>
-      </select>
+      <select id="filtroEstabelecimento" onchange="renderizarTudo()"><option value="TODOS">Todos os Estabelecimentos</option></select>
     </div>
-
     <div class="filter-item">
       <label>Ano:</label>
-      <select id="filtroAno" onchange="renderizarTudo()">
-        <option value="TODOS">Todos os Anos</option>
-      </select>
+      <select id="filtroAno" onchange="renderizarTudo()"><option value="TODOS">Todos os Anos</option></select>
     </div>
-
     <div class="filter-item">
       <label>Quadrimestre:</label>
       <select id="filtroQuadrimestre" onchange="renderizarTudo()">
@@ -106,7 +143,6 @@
         <option value="3º Quadri">3º Quadrimestre</option>
       </select>
     </div>
-
     <div class="filter-item">
       <label>Métrica Tabela:</label>
       <select id="filtroMetrica" onchange="renderizarTudo()">
@@ -116,15 +152,14 @@
       </select>
     </div>
 
-    <button class="btn-export" onclick="exportarParaSheets()">📊 Exportar para Google Planilhas (CSV)</button>
-    <button class="btn-export-docs" onclick="exportarParaDocs()">📄 Copiar p/ Google Docs / Word</button>
-
+    <button class="btn-export" onclick="exportarParaSheets()">📊 Exportar Planilha (CSV)</button>
+    <button class="btn-export-docs" onclick="exportarParaDocs()">📄 Copiar p/ Docs/Word</button>
     <button id="btnLimparGrupo" class="btn-clear-filter" style="display:none;" onclick="limparFiltroGrupo()">❌ Desfazer Seleção de Grupo</button>
   </div>
 
   <div id="painelTabelas">
     <div class="card">
-      <h4 class="card-title" data-titulo="4.1 Produção da Atenção Básica">4.1 Produção da Atenção Básica</h4>
+      <h4 class="card-title" data-titulo="4.1 Produção da Atenção Básica (SISAB)">4.1 Produção da Atenção Básica (SISAB)</h4>
       <div style="overflow-x:auto;"><table id="tb41"><thead></thead><tbody></tbody></table></div>
       <div class="charts-grid">
         <div class="chart-box"><h5>Evolução Temporal</h5><div class="chart-container"><canvas id="chart41_bar"></canvas></div></div>
@@ -186,10 +221,127 @@
   </div>
 </div>
 
-<script>
-let grupoSelecionado = null;
+<div class="modal-overlay" id="modalAdd">
+  <div class="modal-content">
+    <h3>Carregar Dados do Quadrimestre</h3>
+    
+    <div class="form-row">
+      <div class="form-group" style="flex:1;">
+        <label>Ano</label>
+        <input type="number" id="modalAno" value="2026">
+      </div>
+      <div class="form-group" style="flex:1;">
+        <label>Quadrimestre</label>
+        <select id="modalQuadri">
+          <option value="1º Quadri">1º Quadrimestre</option>
+          <option value="2º Quadri" selected>2º Quadrimestre</option>
+          <option value="3º Quadri">3º Quadrimestre</option>
+        </select>
+      </div>
+    </div>
 
-const DADOS_INICIAIS = {
+    <div class="modal-section">
+      <div class="modal-section-title">1. ATENÇÃO BÁSICA (DIGITAÇÃO MANUAL)</div>
+      <div class="form-row">
+        <div class="form-group" style="flex:1;">
+          <label>Visita Domiciliar</label>
+          <input type="number" id="abVisita" value="0">
+        </div>
+        <div class="form-group" style="flex:1;">
+          <label>Atendimento Individual</label>
+          <input type="number" id="abIndiv" value="0">
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group" style="flex:1;">
+          <label>Procedimento</label>
+          <input type="number" id="abProc" value="0">
+        </div>
+        <div class="form-group" style="flex:1;">
+          <label>Atendimento Odontológico</label>
+          <input type="number" id="abOdo" value="0">
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-section-title">2. REGISTROS SIA (.DBF)</div>
+      <div class="form-group">
+        <label>Selecione o arquivo do SIA (DBF):</label>
+        <input type="file" id="fileSIA" accept=".dbf" onchange="lerDBF(this, 'sia')">
+        <div id="msgSIA" class="status-msg"></div>
+      </div>
+    </div>
+
+    <div class="modal-section">
+      <div class="modal-section-title">3. REGISTROS SIH (.DBF)</div>
+      <div class="form-group">
+        <label>Selecione o arquivo do SIH (DBF):</label>
+        <input type="file" id="fileSIH" accept=".dbf" onchange="lerDBF(this, 'sih')">
+        <div id="msgSIH" class="status-msg"></div>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="fecharModal()">Cancelar</button>
+      <button class="btn-save" onclick="salvarQuadrimestreModal()">Salvar na Série Histórica</button>
+    </div>
+  </div>
+</div>
+
+<script>
+function parseDBFBuffer(buffer) {
+  const view = new DataView(buffer);
+  const numRecords = view.getUint32(4, true);
+  const headerLength = view.getUint16(8, true);
+  const recordLength = view.getUint16(10, true);
+
+  const fields = [];
+  let offset = 32;
+
+  while (offset < headerLength - 1) {
+    if (view.getUint8(offset) === 0x0D) break;
+    let nameBytes = new Uint8Array(buffer, offset, 11);
+    let name = "";
+    for (let i = 0; i < 11 && nameBytes[i] !== 0; i++) {
+      name += String.fromCharCode(nameBytes[i]);
+    }
+    const type = String.fromCharCode(view.getUint8(offset + 11));
+    const length = view.getUint8(offset + 16);
+    // Converte o nome do campo para MAIÚSCULAS e remove espaços
+    fields.push({ name: name.trim().toUpperCase(), type, length });
+    offset += 32;
+  }
+
+  const records = [];
+  let recordOffset = headerLength;
+  const decoder = new TextDecoder('windows-1252');
+
+  for (let r = 0; r < numRecords; r++) {
+    if (recordOffset + recordLength > buffer.byteLength) break;
+    const isDeleted = view.getUint8(recordOffset) === 0x2A;
+    if (!isDeleted) {
+      const row = {};
+      let fieldOffset = recordOffset + 1;
+      for (let f = 0; f < fields.length; f++) {
+        const field = fields[f];
+        const bytes = new Uint8Array(buffer, fieldOffset, field.length);
+        const valStr = decoder.decode(bytes).trim();
+        row[field.name] = valStr;
+        fieldOffset += field.length;
+      }
+      records.push(row);
+    }
+    recordOffset += recordLength;
+  }
+  return records;
+}
+
+let grupoSelecionado = null;
+let registrosSIA = [];
+let registrosSIH = [];
+
+const DADOS_PADRAO = {
   "1º Quadri 2026": {
     "4.1": {
       "Atendimento Individual": { "estab": "REDE UBS", "q": 335846, "v": 0 },
@@ -231,59 +383,196 @@ const DADOS_INICIAIS = {
     "4.6": {
       "01 - Ações de Promoção e Prevenção em Saúde": { "estab": "CEREST", "q": 1500, "v": 45000.00 }
     }
-  },
-  "2º Quadri 2026": {
-    "4.1": {
-      "Atendimento Individual": { "estab": "REDE UBS", "q": 335846, "v": 0 },
-      "Atendimento Odontológico": { "estab": "REDE UBS", "q": 26596, "v": 0 },
-      "Procedimento": { "estab": "REDE UBS", "q": 921993, "v": 0 },
-      "Visita Domiciliar": { "estab": "REDE UBS", "q": 288588, "v": 0 }
-    },
-    "4.2.1": {
-      "02 - Procedimentos com Finalidade Diagnóstica": { "estab": "UPA 24H ITAUM", "q": 6984, "v": 310822.97 },
-      "03 - Procedimentos Clínicos": { "estab": "UPA 24H AVENTUREIRO", "q": 18650, "v": 201838.73 },
-      "04 - Procedimentos Cirúrgicos": { "estab": "PA NORTE 24H", "q": 2024, "v": 81837.03 },
-      "05 - Transplantes de Órgãos, Tecidos e Células": { "estab": "HOSPITAL SÃO JOSÉ", "q": 364, "v": 198555.66 },
-      "07 - Órteses, Próteses e Materiais Especiais": { "estab": "HOSPITAL SÃO JOSÉ", "q": 52, "v": 28165.00 }
-    },
-    "4.2.2": {
-      "02 - Procedimentos com Finalidade Diagnóstica": { "estab": "HOSPITAL SÃO JOSÉ", "q": 10, "v": 29218.19 },
-      "03 - Procedimentos Clínicos": { "estab": "HOSPITAL SÃO JOSÉ", "q": 1850, "v": 2751498.98 },
-      "04 - Procedimentos Cirúrgicos": { "estab": "HOSPITAL SÃO JOSÉ", "q": 1977, "v": 4384509.60 },
-      "05 - Transplantes de Órgãos, Tecidos e Células": { "estab": "HOSPITAL SÃO JOSÉ", "q": 81, "v": 476100.00 }
-    },
-    "4.3.1": {
-      "030108 Atendimento/Acompanhamento psicossocial": { "estab": "CAPS AD CENTRO", "q": 33732, "v": 1591931.12 }
-    },
-    "4.4.1": {
-      "01 - Ações de Promoção e Prevenção em Saúde": { "estab": "POLICLÍNICA BOA VISTA", "q": 6217, "v": 81428.30 },
-      "02 - Procedimentos com Finalidade Diagnóstica": { "estab": "GHANEM LABORATÓRIO", "q": 847978, "v": 8105708.88 },
-      "03 - Procedimentos Clínicos": { "estab": "POLICLÍNICA BOA VISTA", "q": 800537, "v": 7755677.46 },
-      "04 - Procedimentos Cirúrgicos": { "estab": "HOSPITAL BETHESDA", "q": 11043, "v": 697924.33 },
-      "05 - Transplantes de Órgãos, Tecidos e Células": { "estab": "HOSPITAL SÃO JOSÉ", "q": 371, "v": 235557.47 },
-      "07 - Órteses, Próteses e Materiais Especiais": { "estab": "CENTRINHO NRLP", "q": 581, "v": 100993.30 },
-      "08 - Ações Complementares da Atenção à Saúde": { "estab": "CIS NORDESTE", "q": 19137, "v": 582888.30 }
-    },
-    "4.4.2": {
-      "02 - Procedimentos com Finalidade Diagnóstica": { "estab": "HOSPITAL BETHESDA", "q": 10, "v": 29218.19 },
-      "03 - Procedimentos Clínicos": { "estab": "HOSPITAL BETHESDA", "q": 1850, "v": 2751498.98 },
-      "04 - Procedimentos Cirúrgicos": { "estab": "HOSPITAL BETHESDA", "q": 1977, "v": 4384509.60 },
-      "05 - Transplantes de Órgãos, Tecidos e Células": { "estab": "HOSPITAL BETHESDA", "q": 81, "v": 476100.00 }
-    },
-    "4.6": {
-      "01 - Ações de Promoção e Prevenção em Saúde": { "estab": "CEREST", "q": 1200, "v": 36000.00 }
-    }
   }
 };
 
-localStorage.removeItem('digisus_historico');
-let bancoHistorico = DADOS_INICIAIS;
+let bancoHistorico = JSON.parse(localStorage.getItem('digisus_historico_v3')) || DADOS_PADRAO;
 let instanciarGraficos = {};
-
 const PALETA_CORES = ['#005691', '#009CDE', '#249E6B', '#00A499', '#483698', '#E31C79', '#E1E000', '#575257'];
+
+function salvarStorage() {
+  localStorage.setItem('digisus_historico_v3', JSON.stringify(bancoHistorico));
+}
 
 function fmtN(v) { return Number(v || 0).toLocaleString('pt-BR'); }
 function fmtM(v) { return Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }); }
+
+function abrirModal() { document.getElementById('modalAdd').style.display = 'flex'; }
+function fecharModal() { document.getElementById('modalAdd').style.display = 'none'; }
+
+function lerDBF(input, tipo) {
+  const file = input.files[0];
+  if (!file) return;
+
+  const msgElement = document.getElementById(tipo === 'sia' ? 'msgSIA' : 'msgSIH');
+  
+  msgElement.className = 'status-carregando';
+  msgElement.innerHTML = `<span class="icone-ampulheta">⏳</span> Processando e lendo arquivo DBF, aguarde...`;
+
+  setTimeout(() => {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        const buffer = e.target.result;
+        const records = parseDBFBuffer(buffer);
+        
+        if (tipo === 'sia') {
+          registrosSIA = records;
+        } else {
+          registrosSIH = records;
+        }
+
+        msgElement.className = 'status-msg';
+        msgElement.style.color = '#68d391';
+        msgElement.innerText = `✓ ${fmtN(records.length)} registros lidos com sucesso!`;
+
+      } catch (err) {
+        msgElement.className = 'status-msg';
+        msgElement.style.color = '#e53e3e';
+        msgElement.innerText = "❌ Erro ao ler o arquivo DBF: " + err.message;
+      }
+    };
+    reader.readAsArrayBuffer(file);
+  }, 50);
+}
+
+function salvarQuadrimestreModal() {
+  const ano = document.getElementById('modalAno').value;
+  const quadri = document.getElementById('modalQuadri').value;
+  const chave = `${quadri} ${ano}`;
+
+  let novoQuadriData = {
+    "4.1": {
+      "Atendimento Individual": { "estab": "REDE UBS", "q": Number(document.getElementById('abIndiv').value) || 0, "v": 0 },
+      "Atendimento Odontológico": { "estab": "REDE UBS", "q": Number(document.getElementById('abOdo').value) || 0, "v": 0 },
+      "Procedimento": { "estab": "REDE UBS", "q": Number(document.getElementById('abProc').value) || 0, "v": 0 },
+      "Visita Domiciliar": { "estab": "REDE UBS", "q": Number(document.getElementById('abVisita').value) || 0, "v": 0 }
+    },
+    "4.2.1": {}, "4.2.2": {}, "4.3.1": {}, "4.4.1": {}, "4.4.2": {}, "4.6": {}
+  };
+
+  // --- PROCESSA ARQUIVO SIA ---
+  registrosSIA.forEach(r => {
+    // Mapeia exatamente a chave PA_PROC_ID encontrada no seu DBF
+    let PA_PROC = String(r.PA_PROC_ID || r.PA_PROCID || r.PA_PROC || r.PA_CODPROC || '').trim();
+    if (!PA_PROC) return;
+
+    // Mapeia valores e quantidades do SIA
+    let qtd = Number(r.PA_QTDAPR || r.PA_QTDPRO || r.PA_QT_PROC || 1);
+    let val = Number(r.PA_VALAPR || r.PA_VALPRO || r.PA_VALOR || 0);
+    let cnes = String(r.PA_CODUNI || r.CNES || 'GERAL').trim();
+    let catend = String(r.PA_CATEND || r.PA_TPFREQ || r.PA_CONDIC || '').trim();
+    let incurg = String(r.PA_INCURG || '').trim();
+
+    let grupo = PA_PROC.substring(0, 2);
+    let nomeGrupo = getNomeGrupoSIA(grupo);
+
+    let sec = "4.4.1"; // Padrão: Especializada/Geral
+
+    if (PA_PROC.startsWith("030108")) {
+      sec = "4.3.1"; // Psicossocial
+    } else if (PA_PROC.startsWith("01")) {
+      sec = "4.6";   // Vigilância em Saúde
+    } else if (catend === '02' || catend === '01' || incurg !== '0000' || cnes.includes('UPA') || cnes.includes('PA')) {
+      sec = "4.2.1"; // Urgência e Emergência
+    }
+
+    if (!novoQuadriData[sec][nomeGrupo]) {
+      novoQuadriData[sec][nomeGrupo] = { estab: cnes, q: 0, v: 0 };
+    }
+    novoQuadriData[sec][nomeGrupo].q += qtd;
+    novoQuadriData[sec][nomeGrupo].v += val;
+  });
+
+  // --- PROCESSA ARQUIVO SIH ---
+  registrosSIH.forEach(r => {
+    let PROC_REA = String(r.PROC_REA || r.PA_PROC_ID || r.PA_PROCID || r.PA_PROC || '').trim();
+    if (!PROC_REA) return;
+
+    let qtd = Number(r.QT_DIARIAS || r.QTD || 1);
+    let val = Number(r.VAL_TOT || r.PA_VALAPR || r.PA_VALPRO || 0);
+    let cnes = String(r.CNES || r.PA_CODUNI || 'HOSPITAL').trim();
+    let carInt = String(r.CAR_INT || '').trim();
+
+    let grupo = PROC_REA.substring(0, 2);
+    let nomeGrupo = getNomeGrupoSIH(grupo);
+
+    let sec = (carInt === '02') ? "4.2.2" : "4.4.2";
+
+    if (!novoQuadriData[sec][nomeGrupo]) {
+      novoQuadriData[sec][nomeGrupo] = { estab: cnes, q: 0, v: 0 };
+    }
+    novoQuadriData[sec][nomeGrupo].q += qtd;
+    novoQuadriData[sec][nomeGrupo].v += val;
+  });
+
+  bancoHistorico[chave] = novoQuadriData;
+  salvarStorage();
+  atualizarFiltrosEstaticos();
+  renderizarTudo();
+  fecharModal();
+  alert(`Quadrimestre ${chave} importado com sucesso!`);
+}
+
+function getNomeGrupoSIA(g) {
+  const map = {
+    '01': '01 - Ações de Promoção e Prevenção em Saúde',
+    '02': '02 - Procedimentos com Finalidade Diagnóstica',
+    '03': '03 - Procedimentos Clínicos',
+    '04': '04 - Procedimentos Cirúrgicos',
+    '05': '05 - Transplantes de Órgãos, Tecidos e Células',
+    '07': '07 - Órteses, Próteses e Materiais Especiais',
+    '08': '08 - Ações Complementares da Atenção à Saúde'
+  };
+  return map[g] || `${g} - Outros Grupos SIA`;
+}
+
+function getNomeGrupoSIH(g) {
+  const map = {
+    '02': '02 - Procedimentos com Finalidade Diagnóstica',
+    '03': '03 - Procedimentos Clínicos',
+    '04': '04 - Procedimentos Cirúrgicos',
+    '05': '05 - Transplantes de Órgãos, Tecidos e Células'
+  };
+  return map[g] || `${g} - Outros Grupos SIH`;
+}
+
+function exportarJSON() {
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(bancoHistorico, null, 2));
+  const link = document.createElement('a');
+  link.setAttribute("href", dataStr);
+  link.setAttribute("download", "historico_digisus.json");
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+}
+
+function importarJSON(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(evt) {
+    try {
+      bancoHistorico = JSON.parse(evt.target.result);
+      salvarStorage();
+      atualizarFiltrosEstaticos();
+      renderizarTudo();
+      alert("Base JSON importada com sucesso!");
+    } catch(err) {
+      alert("Erro ao importar o arquivo JSON fornecido.");
+    }
+  };
+  reader.readAsText(file);
+}
+
+function limparBancoData() {
+  if (confirm("Confirma a restauração da base de dados local para o padrão de fábrica?")) {
+    localStorage.removeItem('digisus_historico_v3');
+    bancoHistorico = JSON.parse(JSON.stringify(DADOS_PADRAO));
+    atualizarFiltrosEstaticos();
+    renderizarTudo();
+  }
+}
 
 function selecionarGrupo(nomeGrupo) {
   grupoSelecionado = (grupoSelecionado === nomeGrupo) ? null : nomeGrupo;
@@ -304,25 +593,20 @@ const pluginRotulosValores = {
     chart.data.datasets.forEach((dataset, i) => {
       const meta = chart.getDatasetMeta(i);
       if (meta.hidden) return;
-
       meta.data.forEach((element, index) => {
         const val = dataset.data[index];
         if (!val || val === 0) return;
-
         ctx.fillStyle = chart.config.type === 'bar' ? '#2d3748' : '#ffffff';
         ctx.font = 'bold 11px sans-serif';
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-
         if (chart.config.type === 'bar') {
           let texto = val > 1000000 ? (val/1000000).toFixed(1)+'M' : (val > 1000 ? (val/1000).toFixed(0)+'k' : val);
           ctx.fillText(texto, element.x, element.y - 8);
         } else if (chart.config.type === 'doughnut') {
           const total = dataset.data.reduce((a, b) => a + b, 0);
-          const pct = ((val / total) * 100).toFixed(0) + '%';
           if ((val / total) > 0.05) {
-            const position = element.tooltipPosition();
-            ctx.fillText(pct, position.x, position.y);
+            ctx.fillText(((val / total) * 100).toFixed(0) + '%', element.tooltipPosition().x, element.tooltipPosition().y);
           }
         }
       });
@@ -361,6 +645,8 @@ function calcularKPIs() {
 
 function renderizarTabelaEGráficos(tabelaId, chartBarId, chartPieId, chaveSecao, temValor = true) {
   const table = document.getElementById(tabelaId);
+  if (!table) return;
+
   const anoFiltro = document.getElementById('filtroAno').value;
   const quadriFiltro = document.getElementById('filtroQuadrimestre').value;
   const estabFiltro = document.getElementById('filtroEstabelecimento').value;
@@ -372,7 +658,7 @@ function renderizarTabelaEGráficos(tabelaId, chartBarId, chartPieId, chaveSecao
 
   const linhasSet = new Set();
   periodos.forEach(p => {
-    if (bancoHistorico[p][chaveSecao]) {
+    if (bancoHistorico[p] && bancoHistorico[p][chaveSecao]) {
       Object.keys(bancoHistorico[p][chaveSecao]).forEach(l => {
         const item = bancoHistorico[p][chaveSecao][l];
         if (estabFiltro === 'TODOS' || item.estab === estabFiltro) {
@@ -401,7 +687,7 @@ function renderizarTabelaEGráficos(tabelaId, chartBarId, chartPieId, chaveSecao
     bodyHTML += `<tr class="clickable-row ${isSelected}" onclick="selecionarGrupo('${linha}')"><td><b>${linha}</b></td>`;
 
     periodos.forEach(p => {
-      const item = (bancoHistorico[p][chaveSecao] && bancoHistorico[p][chaveSecao][linha]) || { q: 0, v: 0, estab: '' };
+      const item = (bancoHistorico[p] && bancoHistorico[p][chaveSecao] && bancoHistorico[p][chaveSecao][linha]) || { q: 0, v: 0, estab: '' };
       const d = (estabFiltro === 'TODOS' || item.estab === estabFiltro) ? item : { q: 0, v: 0 };
 
       rowQ += d.q; rowV += d.v;
@@ -425,7 +711,9 @@ function renderizarTabelaEGráficos(tabelaId, chartBarId, chartPieId, chaveSecao
 }
 
 function renderizarGraficoBarras(chartId, labels, dadosTotais, modoMetrica, temValor) {
-  const ctx = document.getElementById(chartId).getContext('2d');
+  const canvas = document.getElementById(chartId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
   if (instanciarGraficos[chartId]) instanciarGraficos[chartId].destroy();
 
   const datasets = [];
@@ -444,21 +732,20 @@ function renderizarGraficoBarras(chartId, labels, dadosTotais, modoMetrica, temV
       responsive: true,
       maintainAspectRatio: false,
       plugins: { legend: { labels: { color: '#2d3748', font: { size: 10, weight: 'bold' } } } },
-      scales: {
-        x: { ticks: { color: '#4a5568' }, grid: { color: '#e2e8f0' } },
-        y: { ticks: { color: '#4a5568' }, grid: { color: '#e2e8f0' } }
-      }
+      scales: { x: { ticks: { color: '#4a5568' } }, y: { ticks: { color: '#4a5568' } } }
     }
   });
 }
 
 function renderizarGraficoPizza(chartId, linhas, banco, periodos, chaveSecao, temValor, estabFiltro) {
-  const ctx = document.getElementById(chartId).getContext('2d');
+  const canvas = document.getElementById(chartId);
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
   if (instanciarGraficos[chartId]) instanciarGraficos[chartId].destroy();
 
   const dataValues = linhas.map(linha => {
     return periodos.reduce((acc, p) => {
-      const item = (banco[p][chaveSecao] && banco[p][chaveSecao][linha]) || { q: 0, v: 0, estab: '' };
+      const item = (banco[p] && banco[p][chaveSecao] && banco[p][chaveSecao][linha]) || { q: 0, v: 0, estab: '' };
       const d = (estabFiltro === 'TODOS' || item.estab === estabFiltro) ? item : { q: 0, v: 0 };
       return acc + (temValor ? d.v : d.q);
     }, 0);
@@ -475,9 +762,7 @@ function renderizarGraficoPizza(chartId, linhas, banco, periodos, chaveSecao, te
       responsive: true,
       maintainAspectRatio: false,
       onClick: (e, el) => {
-        if (el.length > 0) {
-          selecionarGrupo(linhas[el[0].index]);
-        }
+        if (el.length > 0) selecionarGrupo(linhas[el[0].index]);
       },
       plugins: {
         legend: { position: 'bottom', labels: { color: '#2d3748', font: { size: 9, weight: '500' } } }
@@ -519,9 +804,8 @@ function renderizarTudo() {
   renderizarTabelaEGráficos('tb46', 'chart46_bar', 'chart46_pie', '4.6', true);
 }
 
-// Funções de Exportação
 function exportarParaSheets() {
-  let csvContent = "\uFEFF"; // BOM UTF-8
+  let csvContent = "\uFEFF";
   const elementos = document.querySelectorAll('[data-titulo], table');
 
   elementos.forEach(el => {
@@ -568,9 +852,9 @@ function exportarParaDocs() {
   });
 
   navigator.clipboard.writeText(textContent).then(() => {
-    alert('Tabelas copiadas com sucesso! Abra o Google Docs ou Word e pressione Ctrl + V para colar.');
+    alert('Conteúdo copiado em formato de tabela! Basta pressionar Ctrl + V no Google Docs ou Word.');
   }).catch(() => {
-    alert('Erro ao copiar para a área de transferência.');
+    alert('Falha ao acessar a área de transferência.');
   });
 }
 

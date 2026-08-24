@@ -70,8 +70,24 @@
     .section-block { background: var(--card-bg); border-radius: 8px; padding: 20px; margin-bottom: 25px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
     .section-title { font-size: 1.2rem; color: var(--primary); border-bottom: 2px solid var(--border-color); padding-bottom: 8px; margin-bottom: 15px; }
 
-    table { width: 100%; border-collapse: collapse; margin-bottom: 15px; font-size: 0.9rem; }
-    th, td { border: 1px solid var(--border-color); padding: 10px; text-align: left; }
+    table { 
+  width: 100%; 
+  border-collapse: collapse; 
+  margin-bottom: 15px; 
+  font-size: 0.85rem; 
+}
+    th, td { 
+  border: 1px solid var(--border-color); 
+  padding: 12px 10px; /* Aumenta o espaçamento interno */
+  text-align: left; 
+  vertical-align: middle; 
+  line-height: 1.5; /* Garante que a quantidade e o valor não fiquem sobrepostos */
+}
+    td small {
+  display: block; /* Força o valor em R$ a ir para a linha de baixo organizadamente */
+  margin-top: 3px;
+  font-weight: 600;
+}
     th { background-color: var(--primary); color: white; }
     tr:nth-child(even) { background-color: #f8fafc; }
 

@@ -7,55 +7,58 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f7f9; color: #2d3748; margin: 0; padding: 15px; }
+    :root {
+      --bg: #f4f7f9;
+      --card: #ffffff;
+      --primary: #005691;
+      --primary-dark: #004577;
+      --accent: #d97706;
+      --green: #059669;
+      --red: #dc2626;
+      --line: #cbd5e0;
+      --border: #e2e8f0;
+    }
+
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: #2d3748; margin: 0; padding: 15px; }
     .container { max-width: 98%; margin: 0 auto; }
-    .header { background: linear-gradient(135deg, #004577 0%, #005691 100%); padding: 18px 25px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; color: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+    .header { background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%); padding: 18px 25px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; color: #ffffff; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
     .header h3 { margin: 0; color: #ffffff; font-size: 1.4em; }
     .header span { font-size: 0.85em; color: #d0e4f7; }
 
     .header-actions { display: flex; gap: 8px; }
     .btn-header { padding: 8px 12px; border-radius: 5px; border: none; font-weight: bold; font-size: 0.82em; cursor: pointer; color: white; display: flex; align-items: center; gap: 5px; }
-    .btn-add { background-color: #d97706; } .btn-add:hover { background-color: #b45309; }
-    .btn-exp { background-color: #059669; } .btn-exp:hover { background-color: #047857; }
+    .btn-add { background-color: var(--accent); } .btn-add:hover { background-color: #b45309; }
+    .btn-exp { background-color: var(--green); } .btn-exp:hover { background-color: #047857; }
     .btn-imp { background-color: #6d28d9; } .btn-imp:hover { background-color: #5b21b6; }
-    .btn-del { background-color: #dc2626; } .btn-del:hover { background-color: #b91c1c; }
+    .btn-del { background-color: var(--red); } .btn-del:hover { background-color: #b91c1c; }
 
     .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 20px; }
-    .kpi-card { background: #ffffff; padding: 15px 20px; border-radius: 8px; border: 1px solid #e2e8f0; border-left: 5px solid #005691; box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
+    .kpi-card { background: #ffffff; padding: 15px 20px; border-radius: 8px; border: 1px solid var(--border); border-left: 5px solid var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.03); }
     .kpi-card .kpi-title { font-size: 0.8em; color: #718096; font-weight: bold; text-transform: uppercase; }
-    .kpi-card .kpi-value { font-size: 1.5em; color: #005691; font-weight: bold; margin-top: 5px; }
+    .kpi-card .kpi-value { font-size: 1.5em; color: var(--primary); font-weight: bold; margin-top: 5px; }
     .kpi-card .kpi-sub { font-size: 0.75em; color: #a0aec0; margin-top: 3px; }
 
-    .card { background: #ffffff; padding: 20px; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.04); border: 1px solid #e2e8f0; }
-    .card-title { color: #005691; margin-top: 0; margin-bottom: 15px; font-size: 1.15em; border-bottom: 2px solid #005691; padding-bottom: 8px; font-weight: bold; }
+    .card { background: #ffffff; padding: 20px; border-radius: 8px; margin-bottom: 25px; box-shadow: 0 2px 5px rgba(0,0,0,0.04); border: 1px solid var(--border); }
+    .card-title { color: var(--primary); margin-top: 0; margin-bottom: 15px; font-size: 1.15em; border-bottom: 2px solid var(--primary); padding-bottom: 8px; font-weight: bold; }
 
     .filter-bar { background: #ebf3f9; padding: 12px 20px; border-radius: 8px; margin-bottom: 20px; display: flex; align-items: center; gap: 15px; flex-wrap: wrap; border: 1px solid #cce0f1; }
     .filter-item { display: flex; align-items: center; gap: 8px; }
-    .filter-bar label { font-size: 0.9em; font-weight: bold; color: #004577; }
-    .filter-bar select { background: #ffffff; color: #004577; border: 1px solid #005691; padding: 6px 12px; border-radius: 4px; font-weight: 500; }
-
-    .btn-export { background: #0f9d58; color: #ffffff; border: none; padding: 7px 14px; border-radius: 4px; cursor: pointer; font-size: 0.85em; font-weight: bold; }
-    .btn-export-docs { background: #4285f4; color: #ffffff; border: none; padding: 7px 14px; border-radius: 4px; cursor: pointer; font-size: 0.85em; font-weight: bold; }
+    .filter-bar label { font-size: 0.9em; font-weight: bold; color: var(--primary-dark); }
+    .filter-bar select { background: #ffffff; color: var(--primary-dark); border: 1px solid var(--primary); padding: 6px 12px; border-radius: 4px; font-weight: 500; }
 
     table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88em; margin-bottom: 15px; }
-    th, td { padding: 9px 12px; border: 1px solid #cbd5e0; }
-    th { background-color: #005691; color: #ffffff; font-weight: 600; }
+    th, td { padding: 9px 12px; border: 1px solid var(--line); }
+    th { background-color: var(--primary); color: #ffffff; font-weight: 600; }
     tr.clickable-row { cursor: pointer; transition: background 0.2s; }
     tr.clickable-row:hover { background-color: #e8f4fd; }
     tr.selected-row { background-color: #bee3f8 !important; font-weight: bold; color: #003358; }
 
-    .charts-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 15px; }
-    @media (max-width: 900px) { .charts-grid { grid-template-columns: 1fr; } }
+    .btn-clear-filter { background: var(--red); color: #fff; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8em; margin-left: auto; font-weight: bold; }
+    h5 { color: var(--primary-dark); }
 
-    .chart-box { background: #ffffff; padding: 15px; border-radius: 6px; border: 1px solid #e2e8f0; height: 330px; position: relative; display: flex; flex-direction: column; align-items: center; }
-    .chart-box h5 { margin: 0 0 10px 0; color: #005691; font-size: 0.88em; text-align: center; font-weight: bold; }
-    .chart-container { position: relative; width: 100%; height: 100%; }
-
-    .btn-clear-filter { background: #e53e3e; color: #fff; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8em; margin-left: auto; font-weight: bold; }
-    h5 { color: #004577; }
-
+    /* MODAL E DROPZONE */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 9999; }
-    .modal-content { background: #2d3748; color: #f7fafc; padding: 25px; border-radius: 10px; width: 500px; max-width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
+    .modal-content { background: #2d3748; color: #f7fafc; padding: 25px; border-radius: 10px; width: 550px; max-width: 92%; box-shadow: 0 10px 25px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto; }
     .modal-content h3 { margin-top: 0; color: #f6ad55; border-bottom: 1px solid #4a5568; padding-bottom: 10px; }
     .form-group { margin-bottom: 15px; }
     .form-group label { display: block; font-size: 0.85em; font-weight: bold; margin-bottom: 5px; color: #cbd5e0; }
@@ -63,26 +66,31 @@
     .form-row { display: flex; gap: 10px; }
     .modal-section { border-top: 1px dashed #4a5568; padding-top: 10px; margin-top: 15px; }
     .modal-section-title { font-size: 0.9em; font-weight: bold; color: #f6ad55; margin-bottom: 8px; }
-    .status-msg { font-size: 0.8em; color: #68d391; margin-top: 4px; }
+    
+    .dropzone-box {
+      border: 2px dashed #f6ad55;
+      border-radius: 8px;
+      padding: 15px;
+      text-align: center;
+      background: #1a202c;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .dropzone-box:hover, .dropzone-box.dragover { background: #2a3447; border-color: #68d391; }
+    .dropzone-box p { margin: 0 0 5px 0; font-size: 0.85em; color: #cbd5e0; }
+    .dropzone-box span { font-size: 0.75em; color: #a0aec0; }
+
+    .progress-bar-bg { width: 100%; background: #4a5568; height: 6px; border-radius: 3px; overflow: hidden; margin-top: 8px; display: none; }
+    .progress-bar-fill { height: 100%; background: #68d391; width: 0%; transition: width 0.1s ease; }
+
+    .status-msg { font-size: 0.8em; color: #68d391; margin-top: 6px; font-weight: bold; }
     .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
     .btn-save { background: #38a169; color: white; border: none; padding: 10px 20px; border-radius: 5px; font-weight: bold; cursor: pointer; }
     .btn-cancel { background: #718096; color: white; border: none; padding: 10px 15px; border-radius: 5px; cursor: pointer; }
 
-    /* ESTILOS DA AMPULHETA */
-    @keyframes girar {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    .icone-ampulheta {
-      display: inline-block;
-      animation: girar 1.5s infinite linear;
-      margin-right: 5px;
-    }
-    .status-carregando {
-      font-size: 0.8em;
-      color: #f6ad55;
-      margin-top: 4px;
-    }
+    .toast-container { position: fixed; bottom: 20px; right: 20px; z-index: 10000; display: flex; flex-direction: column; gap: 10px; }
+    .toast { background: #2d3748; color: #fff; padding: 12px 18px; border-radius: 6px; border-left: 4px solid #68d391; box-shadow: 0 4px 12px rgba(0,0,0,0.3); font-size: 0.85em; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
   </style>
 </head>
 <body>
@@ -152,71 +160,41 @@
       </select>
     </div>
 
-    <button class="btn-export" onclick="exportarParaSheets()">📊 Exportar Planilha (CSV)</button>
-    <button class="btn-export-docs" onclick="exportarParaDocs()">📄 Copiar p/ Docs/Word</button>
     <button id="btnLimparGrupo" class="btn-clear-filter" style="display:none;" onclick="limparFiltroGrupo()">❌ Desfazer Seleção de Grupo</button>
   </div>
 
   <div id="painelTabelas">
     <div class="card">
-      <h4 class="card-title" data-titulo="4.1 Produção da Atenção Básica">4.1 Produção da Atenção Básica</h4>
+      <h4 class="card-title">4.1 Produção da Atenção Básica</h4>
       <div style="overflow-x:auto;"><table id="tb41"><thead></thead><tbody></tbody></table></div>
-      <div class="charts-grid">
-        <div class="chart-box"><h5>Evolução Temporal</h5><div class="chart-container"><canvas id="chart41_bar"></canvas></div></div>
-        <div class="chart-box"><h5>Distribuição por Tipo (%)</h5><div class="chart-container"><canvas id="chart41_pie"></canvas></div></div>
-      </div>
     </div>
 
     <div class="card">
       <h4 class="card-title">4.2 Produção de Urgência e Emergência</h4>
-      <h5 data-titulo="4.2.1 Ambulatorial (SIA - URGÊNCIA)">4.2.1 Ambulatorial (SIA - URGÊNCIA)</h5>
+      <h5>4.2.1 Ambulatorial (SIA - URGÊNCIA)</h5>
       <div style="overflow-x:auto;"><table id="tb421"><thead></thead><tbody></tbody></table></div>
-      <div class="charts-grid">
-        <div class="chart-box"><h5>Evolução Temporal</h5><div class="chart-container"><canvas id="chart421_bar"></canvas></div></div>
-        <div class="chart-box"><h5>Distribuição Financeira / Grupo (%)</h5><div class="chart-container"><canvas id="chart421_pie"></canvas></div></div>
-      </div>
 
-      <h5 style="margin-top:25px;" data-titulo="4.2.2 Hospitalar (SIH - CARÁTER INTERNAÇÃO)">4.2.2 Hospitalar (SIH - CARÁTER INTERNAÇÃO)</h5>
+      <h5 style="margin-top:25px;">4.2.2 Hospitalar (SIH - CARÁTER INTERNAÇÃO)</h5>
       <div style="overflow-x:auto;"><table id="tb422"><thead></thead><tbody></tbody></table></div>
-      <div class="charts-grid">
-        <div class="chart-box"><h5>Evolução Temporal</h5><div class="chart-container"><canvas id="chart422_bar"></canvas></div></div>
-        <div class="chart-box"><h5>Distribuição Financeira / Grupo (%)</h5><div class="chart-container"><canvas id="chart422_pie"></canvas></div></div>
-      </div>
     </div>
 
     <div class="card">
-      <h4 class="card-title" data-titulo="4.3.1 Sistema de Informações Ambulatoriais - Atenção Psicossocial (SIA)">4.3.1 Sistema de Informações Ambulatoriais - Atenção Psicossocial (SIA)</h4>
+      <h4 class="card-title">4.3.1 Sistema de Informações Ambulatoriais - Atenção Psicossocial (SIA)</h4>
       <div style="overflow-x:auto;"><table id="tb431"><thead></thead><tbody></tbody></table></div>
-      <div class="charts-grid">
-        <div class="chart-box"><h5>Evolução Temporal</h5><div class="chart-container"><canvas id="chart431_bar"></canvas></div></div>
-        <div class="chart-box"><h5>Distribuição por Forma de Organização (%)</h5><div class="chart-container"><canvas id="chart431_pie"></canvas></div></div>
-      </div>
     </div>
 
     <div class="card">
       <h4 class="card-title">4.4 Produção Especializada e Hospitalar (Geral)</h4>
-      <h5 data-titulo="4.4.1 Sistema de Informações Ambulatoriais (SIA)">4.4.1 Sistema de Informações Ambulatoriais (SIA)</h5>
+      <h5>4.4.1 Sistema de Informações Ambulatoriais (SIA)</h5>
       <div style="overflow-x:auto;"><table id="tb441"><thead></thead><tbody></tbody></table></div>
-      <div class="charts-grid">
-        <div class="chart-box"><h5>Evolução Temporal</h5><div class="chart-container"><canvas id="chart441_bar"></canvas></div></div>
-        <div class="chart-box"><h5>Distribuição Financeira / Grupo (%)</h5><div class="chart-container"><canvas id="chart441_pie"></canvas></div></div>
-      </div>
 
-      <h5 style="margin-top:25px;" data-titulo="4.4.2 Sistema de Informação Hospitalar (SIH)">4.4.2 Sistema de Informação Hospitalar (SIH)</h5>
+      <h5 style="margin-top:25px;">4.4.2 Sistema de Informação Hospitalar (SIH)</h5>
       <div style="overflow-x:auto;"><table id="tb442"><thead></thead><tbody></tbody></table></div>
-      <div class="charts-grid">
-        <div class="chart-box"><h5>Evolução Temporal</h5><div class="chart-container"><canvas id="chart442_bar"></canvas></div></div>
-        <div class="chart-box"><h5>Distribuição Financeira / Grupo (%)</h5><div class="chart-container"><canvas id="chart442_pie"></canvas></div></div>
-      </div>
     </div>
 
     <div class="card">
-      <h4 class="card-title" data-titulo="4.6 Produção de Vigilância em Saúde (SIA)">4.6 Produção de Vigilância em Saúde (SIA)</h4>
+      <h4 class="card-title">4.6 Produção de Vigilância em Saúde (SIA)</h4>
       <div style="overflow-x:auto;"><table id="tb46"><thead></thead><tbody></tbody></table></div>
-      <div class="charts-grid">
-        <div class="chart-box"><h5>Evolução Temporal</h5><div class="chart-container"><canvas id="chart46_bar"></canvas></div></div>
-        <div class="chart-box"><h5>Distribuição Financeira / Grupo (%)</h5><div class="chart-container"><canvas id="chart46_pie"></canvas></div></div>
-      </div>
     </div>
   </div>
 </div>
@@ -266,20 +244,24 @@
 
     <div class="modal-section">
       <div class="modal-section-title">2. REGISTROS SIA (.DBF)</div>
-      <div class="form-group">
-        <label>Selecione o arquivo do SIA (DBF):</label>
-        <input type="file" id="fileSIA" accept=".dbf" onchange="lerDBF(this, 'sia')">
-        <div id="msgSIA" class="status-msg"></div>
+      <div class="dropzone-box" onclick="document.getElementById('fileSIA').click()" ondragover="handleDragOver(event)" onmouseleave="handleDragLeave(event)" ondrop="handleDrop(event, 'sia')">
+        <p>📁 Clique ou arraste o arquivo SIA (.DBF) aqui</p>
+        <span>Processamento otimizado de alto volume</span>
+        <input type="file" id="fileSIA" accept=".dbf" style="display:none;" onchange="lerDBF(this.files[0], 'sia')">
       </div>
+      <div class="progress-bar-bg" id="progressBgSIA"><div class="progress-bar-fill" id="progressFillSIA"></div></div>
+      <div id="msgSIA" class="status-msg"></div>
     </div>
 
     <div class="modal-section">
       <div class="modal-section-title">3. REGISTROS SIH (.DBF)</div>
-      <div class="form-group">
-        <label>Selecione o arquivo do SIH (DBF):</label>
-        <input type="file" id="fileSIH" accept=".dbf" onchange="lerDBF(this, 'sih')">
-        <div id="msgSIH" class="status-msg"></div>
+      <div class="dropzone-box" onclick="document.getElementById('fileSIH').click()" ondragover="handleDragOver(event)" onmouseleave="handleDragLeave(event)" ondrop="handleDrop(event, 'sih')">
+        <p>📁 Clique ou arraste o arquivo SIH (.DBF) aqui</p>
+        <span>Processamento otimizado de alto volume</span>
+        <input type="file" id="fileSIH" accept=".dbf" style="display:none;" onchange="lerDBF(this.files[0], 'sih')">
       </div>
+      <div class="progress-bar-bg" id="progressBgSIH"><div class="progress-bar-fill" id="progressFillSIH"></div></div>
+      <div id="msgSIH" class="status-msg"></div>
     </div>
 
     <div class="modal-actions">
@@ -289,8 +271,48 @@
   </div>
 </div>
 
+<div class="toast-container" id="toastContainer"></div>
+
 <script>
-function parseDBFBuffer(buffer) {
+const DADOS_PADRAO = {};
+let bancoHistorico = JSON.parse(localStorage.getItem('digisus_historico_v3')) || DADOS_PADRAO;
+let grupoSelecionado = null;
+let registrosSIA = [];
+let registrosSIH = [];
+
+function salvarStorage() { localStorage.setItem('digisus_historico_v3', JSON.stringify(bancoHistorico)); }
+function fmtN(v) { return Number(v || 0).toLocaleString('pt-BR'); }
+function fmtM(v) { return Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 2 }); }
+
+function parseNum(val) {
+  if (typeof val === 'number') return isNaN(val) ? 0 : val;
+  if (!val) return 0;
+  let s = String(val).trim().replace(',', '.');
+  let parsed = parseFloat(s);
+  return isNaN(parsed) ? 0 : parsed;
+}
+
+function abrirModal() { document.getElementById('modalAdd').style.display = 'flex'; }
+function fecharModal() { document.getElementById('modalAdd').style.display = 'none'; }
+
+function showToast(msg) {
+  const container = document.getElementById('toastContainer');
+  const toast = document.createElement('div');
+  toast.className = 'toast';
+  toast.innerText = msg;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 4000);
+}
+
+function handleDragOver(e) { e.preventDefault(); e.currentTarget.classList.add('dragover'); }
+function handleDragLeave(e) { e.currentTarget.classList.remove('dragover'); }
+function handleDrop(e, tipo) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('dragover');
+  if (e.dataTransfer.files.length > 0) lerDBF(e.dataTransfer.files[0], tipo);
+}
+
+async function parseDBFBufferAsync(buffer, onProgress) {
   const view = new DataView(buffer);
   const numRecords = view.getUint32(4, true);
   const headerLength = view.getUint16(8, true);
@@ -308,7 +330,6 @@ function parseDBFBuffer(buffer) {
     }
     const type = String.fromCharCode(view.getUint8(offset + 11));
     const length = view.getUint8(offset + 16);
-    // Converte o nome do campo para MAIÚSCULAS e remove espaços
     fields.push({ name: name.trim().toUpperCase(), type, length });
     offset += 32;
   }
@@ -316,9 +337,11 @@ function parseDBFBuffer(buffer) {
   const records = [];
   let recordOffset = headerLength;
   const decoder = new TextDecoder('windows-1252');
+  const CHUNK_SIZE = 5000;
 
   for (let r = 0; r < numRecords; r++) {
     if (recordOffset + recordLength > buffer.byteLength) break;
+    
     const isDeleted = view.getUint8(recordOffset) === 0x2A;
     if (!isDeleted) {
       const row = {};
@@ -326,192 +349,52 @@ function parseDBFBuffer(buffer) {
       for (let f = 0; f < fields.length; f++) {
         const field = fields[f];
         const bytes = new Uint8Array(buffer, fieldOffset, field.length);
-        const valStr = decoder.decode(bytes).trim();
-        row[field.name] = valStr;
+        row[field.name] = decoder.decode(bytes).trim();
         fieldOffset += field.length;
       }
       records.push(row);
     }
     recordOffset += recordLength;
+
+    if (r % CHUNK_SIZE === 0) {
+      if (onProgress) onProgress(Math.round((r / numRecords) * 100));
+      await new Promise(resolve => setTimeout(resolve, 0));
+    }
   }
+
+  if (onProgress) onProgress(100);
   return records;
 }
 
-let grupoSelecionado = null;
-let registrosSIA = [];
-let registrosSIH = [];
-
-const DADOS_PADRAO = {
-  "1º Quadri 2026": {
-    "4.1": {
-      "Atendimento Individual": { "estab": "REDE UBS", "q": 335846, "v": 0 },
-      "Atendimento Odontológico": { "estab": "REDE UBS", "q": 26596, "v": 0 },
-      "Procedimento": { "estab": "REDE UBS", "q": 921993, "v": 0 },
-      "Visita Domiciliar": { "estab": "REDE UBS", "q": 288588, "v": 0 }
-    },
-    "4.2.1": {
-      "02 - Procedimentos com Finalidade Diagnóstica": { "estab": "UPA 24H ITAUM", "q": 8180, "v": 697387.10 },
-      "03 - Procedimentos Clínicos": { "estab": "UPA 24H AVENTUREIRO", "q": 43265, "v": 713639.51 },
-      "04 - Procedimentos Cirúrgicos": { "estab": "PA NORTE 24H", "q": 2389, "v": 110991.17 },
-      "05 - Transplantes de Órgãos, Tecidos e Células": { "estab": "HOSPITAL SÃO JOSÉ", "q": 399, "v": 357787.31 },
-      "07 - Órteses, Próteses e Materiais Especiais": { "estab": "HOSPITAL SÃO JOSÉ", "q": 112, "v": 28641.48 }
-    },
-    "4.2.2": {
-      "02 - Procedimentos com Finalidade Diagnóstica": { "estab": "HOSPITAL SÃO JOSÉ", "q": 33, "v": 28938.19 },
-      "03 - Procedimentos Clínicos": { "estab": "HOSPITAL SÃO JOSÉ", "q": 2221, "v": 6015565.41 },
-      "04 - Procedimentos Cirúrgicos": { "estab": "HOSPITAL SÃO JOSÉ", "q": 2412, "v": 9663952.19 },
-      "05 - Transplantes de Órgãos, Tecidos e Células": { "estab": "HOSPITAL SÃO JOSÉ", "q": 165, "v": 1013750.21 }
-    },
-    "4.3.1": {
-      "030108 Atendimento/Acompanhamento psicossocial": { "estab": "CAPS AD CENTRO", "q": 32264, "v": 2626017.32 }
-    },
-    "4.4.1": {
-      "01 - Ações de Promoção e Prevenção em Saúde": { "estab": "POLICLÍNICA BOA VISTA", "q": 12192, "v": 106478.78 },
-      "02 - Procedimentos com Finalidade Diagnóstica": { "estab": "GHANEM LABORATÓRIO", "q": 1288768, "v": 15147452.79 },
-      "03 - Procedimentos Clínicos": { "estab": "POLICLÍNICA BOA VISTA", "q": 1083981, "v": 15507026.02 },
-      "04 - Procedimentos Cirúrgicos": { "estab": "HOSPITAL BETHESDA", "q": 20006, "v": 1629803.95 },
-      "05 - Transplantes de Órgãos, Tecidos e Células": { "estab": "HOSPITAL SÃO JOSÉ", "q": 473, "v": 391039.38 },
-      "07 - Órteses, Próteses e Materiais Especiais": { "estab": "CENTRINHO NRLP", "q": 456, "v": 464284.18 },
-      "08 - Ações Complementares da Atenção à Saúde": { "estab": "CIS NORDESTE", "q": 22220, "v": 1051538.78 }
-    },
-    "4.4.2": {
-      "02 - Procedimentos com Finalidade Diagnóstica": { "estab": "HOSPITAL BETHESDA", "q": 33, "v": 28938.19 },
-      "03 - Procedimentos Clínicos": { "estab": "HOSPITAL BETHESDA", "q": 2221, "v": 6015565.41 },
-      "04 - Procedimentos Cirúrgicos": { "estab": "HOSPITAL BETHESDA", "q": 2412, "v": 9663952.19 },
-      "05 - Transplantes de Órgãos, Tecidos e Células": { "estab": "HOSPITAL BETHESDA", "q": 165, "v": 1013750.21 }
-    },
-    "4.6": {
-      "01 - Ações de Promoção e Prevenção em Saúde": { "estab": "CEREST", "q": 1500, "v": 45000.00 }
-    }
-  }
-};
-
-let bancoHistorico = JSON.parse(localStorage.getItem('digisus_historico_v3')) || DADOS_PADRAO;
-let instanciarGraficos = {};
-const PALETA_CORES = ['#005691', '#009CDE', '#249E6B', '#00A499', '#483698', '#E31C79', '#E1E000', '#575257'];
-
-function salvarStorage() {
-  localStorage.setItem('digisus_historico_v3', JSON.stringify(bancoHistorico));
-}
-
-function fmtN(v) { return Number(v || 0).toLocaleString('pt-BR'); }
-function fmtM(v) { return Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }); }
-
-function abrirModal() { document.getElementById('modalAdd').style.display = 'flex'; }
-function fecharModal() { document.getElementById('modalAdd').style.display = 'none'; }
-
-function lerDBF(input, tipo) {
-  const file = input.files[0];
+async function lerDBF(file, tipo) {
   if (!file) return;
 
   const msgElement = document.getElementById(tipo === 'sia' ? 'msgSIA' : 'msgSIH');
-  
-  msgElement.className = 'status-carregando';
-  msgElement.innerHTML = `<span class="icone-ampulheta">⏳</span> Processando e lendo arquivo DBF, aguarde...`;
+  const progressBg = document.getElementById(tipo === 'sia' ? 'progressBgSIA' : 'progressBgSIH');
+  const progressFill = document.getElementById(tipo === 'sia' ? 'progressFillSIA' : 'progressFillSIH');
 
-  setTimeout(() => {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      try {
-        const buffer = e.target.result;
-        const records = parseDBFBuffer(buffer);
-        
-        if (tipo === 'sia') {
-          registrosSIA = records;
-        } else {
-          registrosSIH = records;
-        }
+  progressBg.style.display = 'block';
+  progressFill.style.width = '0%';
+  msgElement.style.color = '#f6ad55';
+  msgElement.innerText = "Lendo arquivo...";
 
-        msgElement.className = 'status-msg';
-        msgElement.style.color = '#68d391';
-        msgElement.innerText = `✓ ${fmtN(records.length)} registros lidos com sucesso!`;
+  try {
+    const buffer = await file.arrayBuffer();
+    const records = await parseDBFBufferAsync(buffer, (pct) => {
+      progressFill.style.width = `${pct}%`;
+      msgElement.innerText = `Processando registros: ${pct}%`;
+    });
 
-      } catch (err) {
-        msgElement.className = 'status-msg';
-        msgElement.style.color = '#e53e3e';
-        msgElement.innerText = "❌ Erro ao ler o arquivo DBF: " + err.message;
-      }
-    };
-    reader.readAsArrayBuffer(file);
-  }, 50);
-}
+    if (tipo === 'sia') registrosSIA = records;
+    else registrosSIH = records;
 
-function salvarQuadrimestreModal() {
-  const ano = document.getElementById('modalAno').value;
-  const quadri = document.getElementById('modalQuadri').value;
-  const chave = `${quadri} ${ano}`;
-
-  let novoQuadriData = {
-    "4.1": {
-      "Atendimento Individual": { "estab": "REDE UBS", "q": Number(document.getElementById('abIndiv').value) || 0, "v": 0 },
-      "Atendimento Odontológico": { "estab": "REDE UBS", "q": Number(document.getElementById('abOdo').value) || 0, "v": 0 },
-      "Procedimento": { "estab": "REDE UBS", "q": Number(document.getElementById('abProc').value) || 0, "v": 0 },
-      "Visita Domiciliar": { "estab": "REDE UBS", "q": Number(document.getElementById('abVisita').value) || 0, "v": 0 }
-    },
-    "4.2.1": {}, "4.2.2": {}, "4.3.1": {}, "4.4.1": {}, "4.4.2": {}, "4.6": {}
-  };
-
-  // --- PROCESSA ARQUIVO SIA ---
-  registrosSIA.forEach(r => {
-    // Mapeia exatamente a chave PA_PROC_ID encontrada no seu DBF
-    let PA_PROC = String(r.PA_PROC_ID || r.PA_PROCID || r.PA_PROC || r.PA_CODPROC || '').trim();
-    if (!PA_PROC) return;
-
-    // Mapeia valores e quantidades do SIA
-    let qtd = Number(r.PA_QTDAPR || r.PA_QTDPRO || r.PA_QT_PROC || 1);
-    let val = Number(r.PA_VALAPR || r.PA_VALPRO || r.PA_VALOR || 0);
-    let cnes = String(r.PA_CODUNI || r.CNES || 'GERAL').trim();
-    let catend = String(r.PA_CATEND || r.PA_TPFREQ || r.PA_CONDIC || '').trim();
-    let incurg = String(r.PA_INCURG || '').trim();
-
-    let grupo = PA_PROC.substring(0, 2);
-    let nomeGrupo = getNomeGrupoSIA(grupo);
-
-    let sec = "4.4.1"; // Padrão: Especializada/Geral
-
-    if (PA_PROC.startsWith("030108")) {
-      sec = "4.3.1"; // Psicossocial
-    } else if (PA_PROC.startsWith("01")) {
-      sec = "4.6";   // Vigilância em Saúde
-    } else if (catend === '02' || catend === '01' || incurg !== '0000' || cnes.includes('UPA') || cnes.includes('PA')) {
-      sec = "4.2.1"; // Urgência e Emergência
-    }
-
-    if (!novoQuadriData[sec][nomeGrupo]) {
-      novoQuadriData[sec][nomeGrupo] = { estab: cnes, q: 0, v: 0 };
-    }
-    novoQuadriData[sec][nomeGrupo].q += qtd;
-    novoQuadriData[sec][nomeGrupo].v += val;
-  });
-
-  // --- PROCESSA ARQUIVO SIH ---
-  registrosSIH.forEach(r => {
-    let PROC_REA = String(r.PROC_REA || r.PA_PROC_ID || r.PA_PROCID || r.PA_PROC || '').trim();
-    if (!PROC_REA) return;
-
-    let qtd = Number(r.QT_DIARIAS || r.QTD || 1);
-    let val = Number(r.VAL_TOT || r.PA_VALAPR || r.PA_VALPRO || 0);
-    let cnes = String(r.CNES || r.PA_CODUNI || 'HOSPITAL').trim();
-    let carInt = String(r.CAR_INT || '').trim();
-
-    let grupo = PROC_REA.substring(0, 2);
-    let nomeGrupo = getNomeGrupoSIH(grupo);
-
-    let sec = (carInt === '02') ? "4.2.2" : "4.4.2";
-
-    if (!novoQuadriData[sec][nomeGrupo]) {
-      novoQuadriData[sec][nomeGrupo] = { estab: cnes, q: 0, v: 0 };
-    }
-    novoQuadriData[sec][nomeGrupo].q += qtd;
-    novoQuadriData[sec][nomeGrupo].v += val;
-  });
-
-  bancoHistorico[chave] = novoQuadriData;
-  salvarStorage();
-  atualizarFiltrosEstaticos();
-  renderizarTudo();
-  fecharModal();
-  alert(`Quadrimestre ${chave} importado com sucesso!`);
+    msgElement.style.color = '#68d391';
+    msgElement.innerText = `✓ ${fmtN(records.length)} registros lidos com sucesso!`;
+    showToast(`Arquivo ${file.name} (${fmtN(records.length)} lin.) carregado!`);
+  } catch (err) {
+    msgElement.style.color = '#e53e3e';
+    msgElement.innerText = "❌ Erro ao ler arquivo DBF: " + err.message;
+  }
 }
 
 function getNomeGrupoSIA(g) {
@@ -537,6 +420,152 @@ function getNomeGrupoSIH(g) {
   return map[g] || `${g} - Outros Grupos SIH`;
 }
 
+async function salvarQuadrimestreModal() {
+  try {
+    const btnSalvar = document.querySelector('.modal-actions .btn-save');
+    if (btnSalvar) btnSalvar.disabled = true;
+
+    const ano = document.getElementById('modalAno').value;
+    const quadri = document.getElementById('modalQuadri').value;
+    const chave = `${quadri} ${ano}`;
+
+    let novoQuadriData = {
+      "4.1": {
+        "Atendimento Individual": { "estab": "REDE UBS", "q": parseNum(document.getElementById('abIndiv').value), "v": 0 },
+        "Atendimento Odontológico": { "estab": "REDE UBS", "q": parseNum(document.getElementById('abOdo').value), "v": 0 },
+        "Procedimento": { "estab": "REDE UBS", "q": parseNum(document.getElementById('abProc').value), "v": 0 },
+        "Visita Domiciliar": { "estab": "REDE UBS", "q": parseNum(document.getElementById('abVisita').value), "v": 0 }
+      },
+      "4.2.1": {}, "4.2.2": {}, "4.3.1": {}, "4.4.1": {}, "4.4.2": {}, "4.6": {}
+    };
+
+    const processarChunked = (array, fnProcessar, tamanhoLote = 25000) => {
+      return new Promise((resolve) => {
+        let index = 0;
+        function processarProximoLote() {
+          let fim = Math.min(index + tamanhoLote, array.length);
+          for (; index < fim; index++) {
+            fnProcessar(array[index]);
+          }
+          if (index < array.length) {
+            requestAnimationFrame(processarProximoLote);
+          } else {
+            resolve();
+          }
+        }
+        processarProximoLote();
+      });
+    };
+
+    // --- PROCESSAMENTO SIA ---
+if (Array.isArray(registrosSIA) && registrosSIA.length > 0) {
+  await processarChunked(registrosSIA, (r) => {
+    if (!r) return;
+    let PA_PROC = String(r.PA_PROC_ID || r.PA_PROCID || r.PA_PROC || r.PA_CODPROC || '').trim();
+    if (!PA_PROC || PA_PROC.length < 2) return;
+
+    // Lógica alinhada com TabWin: Frequência = PA_QTDAPR
+    let qtdVal = r.PA_QTDAPR !== undefined ? r.PA_QTDAPR : (r.PA_QTDPRO || 0);
+    let qtd = parseNum(qtdVal);
+
+    if (qtd <= 0) return;
+
+    let val = parseNum(r.PA_VALAPR !== undefined ? r.PA_VALAPR : (r.PA_VALPRO || 0));
+    let cnes = String(r.PA_CODUNI || r.CNES || 'GERAL').trim();
+
+    // Normaliza Caráter de Atendimento para 2 dígitos (ex: '2' -> '02')
+    let rawCarater = String(r.PA_CATEND ?? r.PA_CATE ?? r.PA_TPFREQ ?? r.PA_CONDIC ?? '').trim();
+    let caraterStr = rawCarater.padStart(2, '0');
+
+    let financ = String(r.PA_FINANC || r.PA_TPFIN || r.PA_CDFIN || '').trim();
+    let grupo = PA_PROC.substring(0, 2);
+    let nomeGrupo = getNomeGrupoSIA(grupo);
+
+    const acumular = (sec) => {
+      if (!novoQuadriData[sec][nomeGrupo]) {
+        novoQuadriData[sec][nomeGrupo] = { estab: cnes, q: 0, v: 0 };
+      }
+      novoQuadriData[sec][nomeGrupo].q += qtd;
+      novoQuadriData[sec][nomeGrupo].v += val;
+    };
+
+    // 1. Sempre acumula na tabela Produção Geral (4.4.1)
+    acumular("4.4.1");
+
+    // 2. Filtro 4.3.1 - Atenção Psicossocial
+    if (PA_PROC.startsWith("030108")) {
+      acumular("4.3.1");
+    }
+
+    // 3. Filtro 4.6 - Vigilância em Saúde
+    if (financ === '07' || financ === '7' || PA_PROC.startsWith("0104")) {
+      acumular("4.6");
+    }
+
+    // 4. Filtro 4.2.1 - Urgência Ambulatorial (Estritamente Caráter '02')
+    if (caraterStr === '02') {
+      acumular("4.2.1");
+    }
+  });
+}
+
+    // --- PROCESSAMENTO SIH ---
+if (Array.isArray(registrosSIH) && registrosSIH.length > 0) {
+  await processarChunked(registrosSIH, (r) => {
+    if (!r) return;
+    
+    // Procedimento Realizado no SIH
+    let PROC_REA = String(r.PROC_REA || r.PA_PROC_ID || r.PA_PROCID || r.PA_PROC || r.PROC_SOL || '').trim();
+    if (!PROC_REA || PROC_REA.length < 2) return;
+
+    // Frequência no SIH TabWin = 1 registro por AIH
+    let qtd = 1;
+
+    let val = parseNum(r.VAL_TOT || r.PA_VALAPR || r.PA_VALPRO || 0);
+    let cnes = String(r.CNES || r.PA_CODUNI || 'HOSPITAL').trim();
+    
+    // Normaliza Caráter de Internação para 2 dígitos ('02' = Urgência)
+    let rawCarInt = String(r.CAR_INT ?? r.PA_CATEND ?? '').trim();
+    let carIntStr = rawCarInt.padStart(2, '0');
+
+    let grupo = PROC_REA.substring(0, 2);
+    let nomeGrupo = getNomeGrupoSIH(grupo);
+
+    const acumularSIH = (sec) => {
+      if (!novoQuadriData[sec][nomeGrupo]) {
+        novoQuadriData[sec][nomeGrupo] = { estab: cnes, q: 0, v: 0 };
+      }
+      novoQuadriData[sec][nomeGrupo].q += qtd;
+      novoQuadriData[sec][nomeGrupo].v += val;
+    };
+
+    // 1. Acumula na Produção Geral Hospitalar (4.4.2)
+    acumularSIH("4.4.2");
+
+    // 2. Acumula na Urgência Hospitalar (4.2.2 - Estritamente Caráter '02')
+    if (carIntStr === '02') {
+      acumularSIH("4.2.2");
+    }
+  });
+}
+
+    bancoHistorico[chave] = novoQuadriData;
+    salvarStorage();
+    atualizarFiltrosEstaticos();
+    renderizarTudo();
+    fecharModal();
+    
+    registrosSIA = [];
+    registrosSIH = [];
+
+    if (btnSalvar) btnSalvar.disabled = false;
+    showToast(`Quadrimestre ${chave} salvo com sucesso!`);
+  } catch (err) {
+    console.error("Erro ao processar:", err);
+    alert("Erro ao processar registros: " + err.message);
+  }
+}
+
 function exportarJSON() {
   const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(bancoHistorico, null, 2));
   const link = document.createElement('a');
@@ -557,7 +586,7 @@ function importarJSON(e) {
       salvarStorage();
       atualizarFiltrosEstaticos();
       renderizarTudo();
-      alert("Base JSON importada com sucesso!");
+      showToast("Base JSON importada!");
     } catch(err) {
       alert("Erro ao importar o arquivo JSON fornecido.");
     }
@@ -566,11 +595,12 @@ function importarJSON(e) {
 }
 
 function limparBancoData() {
-  if (confirm("Confirma a restauração da base de dados local para o padrão de fábrica?")) {
+  if (confirm("Confirma a restauração e limpeza completa da base de dados local?")) {
     localStorage.removeItem('digisus_historico_v3');
-    bancoHistorico = JSON.parse(JSON.stringify(DADOS_PADRAO));
+    bancoHistorico = {};
     atualizarFiltrosEstaticos();
     renderizarTudo();
+    showToast("Base de dados zerada com sucesso!");
   }
 }
 
@@ -585,34 +615,6 @@ function limparFiltroGrupo() {
   document.getElementById('btnLimparGrupo').style.display = 'none';
   renderizarTudo();
 }
-
-const pluginRotulosValores = {
-  id: 'rotulosValores',
-  afterDatasetsDraw(chart) {
-    const { ctx } = chart;
-    chart.data.datasets.forEach((dataset, i) => {
-      const meta = chart.getDatasetMeta(i);
-      if (meta.hidden) return;
-      meta.data.forEach((element, index) => {
-        const val = dataset.data[index];
-        if (!val || val === 0) return;
-        ctx.fillStyle = chart.config.type === 'bar' ? '#2d3748' : '#ffffff';
-        ctx.font = 'bold 11px sans-serif';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        if (chart.config.type === 'bar') {
-          let texto = val > 1000000 ? (val/1000000).toFixed(1)+'M' : (val > 1000 ? (val/1000).toFixed(0)+'k' : val);
-          ctx.fillText(texto, element.x, element.y - 8);
-        } else if (chart.config.type === 'doughnut') {
-          const total = dataset.data.reduce((a, b) => a + b, 0);
-          if ((val / total) > 0.05) {
-            ctx.fillText(((val / total) * 100).toFixed(0) + '%', element.tooltipPosition().x, element.tooltipPosition().y);
-          }
-        }
-      });
-    });
-  }
-};
 
 function calcularKPIs() {
   const anoFiltro = document.getElementById('filtroAno').value;
@@ -643,7 +645,31 @@ function calcularKPIs() {
   document.getElementById('kpiSIHV').innerText = fmtM(sihV);
 }
 
-function renderizarTabelaEGráficos(tabelaId, chartBarId, chartPieId, chaveSecao, temValor = true) {
+function atualizarFiltrosEstaticos() {
+  const estabs = new Set();
+  const anos = new Set();
+
+  Object.keys(bancoHistorico).forEach(p => {
+    const partes = p.split(' ');
+    if (partes.length > 1) anos.add(partes[partes.length - 1]);
+    Object.keys(bancoHistorico[p]).forEach(sec => {
+      Object.keys(bancoHistorico[p][sec]).forEach(item => {
+        if (bancoHistorico[p][sec][item].estab) estabs.add(bancoHistorico[p][sec][item].estab);
+      });
+    });
+  });
+
+  const selE = document.getElementById('filtroEstabelecimento');
+  const selA = document.getElementById('filtroAno');
+  
+  selE.innerHTML = '<option value="TODOS">Todos os Estabelecimentos</option>';
+  estabs.forEach(e => selE.innerHTML += `<option value="${e}">${e}</option>`);
+
+  selA.innerHTML = '<option value="TODOS">Todos os Anos</option>';
+  anos.forEach(a => selA.innerHTML += `<option value="${a}">${a}</option>`);
+}
+
+function renderizarTabelaEGráficos(tabelaId, chaveSecao, temValor = true) {
   const table = document.getElementById(tabelaId);
   if (!table) return;
 
@@ -673,192 +699,55 @@ function renderizarTabelaEGráficos(tabelaId, chartBarId, chartPieId, chaveSecao
   let headHTML = `<tr><th>Item / Grupo</th>`;
   periodos.forEach(p => headHTML += (modoMetrica === 'AMBOS' && temValor) ? `<th colspan="2" style="text-align:center">${p}</th>` : `<th>${p}</th>`);
   headHTML += (modoMetrica === 'AMBOS' && temValor) ? `<th colspan="2" style="text-align:center">Total</th></tr>` : `<th>Total</th></tr>`;
-  table.querySelector('thead').innerHTML = headHTML;
 
-  let bodyHTML = '';
-  const totaisColuna = {};
-  periodos.forEach(p => totaisColuna[p] = { q: 0, v: 0 });
+  if (modoMetrica === 'AMBOS' && temValor) {
+    headHTML += `<tr><th></th>`;
+    periodos.forEach(() => headHTML += `<th>Qtd</th><th>Valor</th>`);
+    headHTML += `<th>Qtd</th><th>Valor</th></tr>`;
+  }
 
+  const thead = table.querySelector('thead');
+  const tbody = table.querySelector('tbody');
+
+  if (thead) thead.innerHTML = headHTML;
+
+  let bodyHTML = "";
   linhas.forEach(linha => {
     if (grupoSelecionado && grupoSelecionado !== linha) return;
-
+    let rowClass = (grupoSelecionado === linha) ? "selected-row" : "";
+    bodyHTML += `<tr class="clickable-row ${rowClass}" onclick="selecionarGrupo('${linha}')"><td><b>${linha}</b></td>`;
     let rowQ = 0, rowV = 0;
-    const isSelected = (grupoSelecionado === linha) ? 'selected-row' : '';
-    bodyHTML += `<tr class="clickable-row ${isSelected}" onclick="selecionarGrupo('${linha}')"><td><b>${linha}</b></td>`;
 
     periodos.forEach(p => {
-      const item = (bancoHistorico[p] && bancoHistorico[p][chaveSecao] && bancoHistorico[p][chaveSecao][linha]) || { q: 0, v: 0, estab: '' };
-      const d = (estabFiltro === 'TODOS' || item.estab === estabFiltro) ? item : { q: 0, v: 0 };
-
+      const d = (bancoHistorico[p] && bancoHistorico[p][chaveSecao] && bancoHistorico[p][chaveSecao][linha]) ? bancoHistorico[p][chaveSecao][linha] : { q: 0, v: 0 };
       rowQ += d.q; rowV += d.v;
-      totaisColuna[p].q += d.q; totaisColuna[p].v += d.v;
 
-      if (modoMetrica === 'Q' || !temValor) bodyHTML += `<td>${fmtN(d.q)}</td>`;
+      if (modoMetrica === 'Q') bodyHTML += `<td>${fmtN(d.q)}</td>`;
       else if (modoMetrica === 'V') bodyHTML += `<td>${fmtM(d.v)}</td>`;
-      else bodyHTML += `<td>${fmtN(d.q)}</td><td>${fmtM(d.v)}</td>`;
+      else { bodyHTML += `<td>${fmtN(d.q)}</td>`; if (temValor) bodyHTML += `<td>${fmtM(d.v)}</td>`; }
     });
 
-    if (modoMetrica === 'Q' || !temValor) bodyHTML += `<td><b>${fmtN(rowQ)}</b></td>`;
+    if (modoMetrica === 'Q') bodyHTML += `<td><b>${fmtN(rowQ)}</b></td>`;
     else if (modoMetrica === 'V') bodyHTML += `<td><b>${fmtM(rowV)}</b></td>`;
-    else bodyHTML += `<td><b>${fmtN(rowQ)}</b></td><td><b>${fmtM(rowV)}</b></td>`;
+    else { bodyHTML += `<td><b>${fmtN(rowQ)}</b></td>`; if (temValor) bodyHTML += `<td><b>${fmtM(rowV)}</b></td>`; }
     bodyHTML += `</tr>`;
   });
 
-  table.querySelector('tbody').innerHTML = bodyHTML;
-
-  renderizarGraficoBarras(chartBarId, periodos, totaisColuna, modoMetrica, temValor);
-  renderizarGraficoPizza(chartPieId, linhas, bancoHistorico, periodos, chaveSecao, temValor, estabFiltro);
-}
-
-function renderizarGraficoBarras(chartId, labels, dadosTotais, modoMetrica, temValor) {
-  const canvas = document.getElementById(chartId);
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  if (instanciarGraficos[chartId]) instanciarGraficos[chartId].destroy();
-
-  const datasets = [];
-  if (modoMetrica === 'Q' || modoMetrica === 'AMBOS' || !temValor) {
-    datasets.push({ label: 'Quantidade', data: labels.map(p => dadosTotais[p].q), backgroundColor: '#005691' });
-  }
-  if (temValor && (modoMetrica === 'V' || modoMetrica === 'AMBOS')) {
-    datasets.push({ label: 'Valor (R$)', data: labels.map(p => dadosTotais[p].v), backgroundColor: '#009CDE' });
-  }
-
-  instanciarGraficos[chartId] = new Chart(ctx, {
-    type: 'bar',
-    data: { labels, datasets },
-    plugins: [pluginRotulosValores],
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: { legend: { labels: { color: '#2d3748', font: { size: 10, weight: 'bold' } } } },
-      scales: { x: { ticks: { color: '#4a5568' } }, y: { ticks: { color: '#4a5568' } } }
-    }
-  });
-}
-
-function renderizarGraficoPizza(chartId, linhas, banco, periodos, chaveSecao, temValor, estabFiltro) {
-  const canvas = document.getElementById(chartId);
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  if (instanciarGraficos[chartId]) instanciarGraficos[chartId].destroy();
-
-  const dataValues = linhas.map(linha => {
-    return periodos.reduce((acc, p) => {
-      const item = (banco[p] && banco[p][chaveSecao] && banco[p][chaveSecao][linha]) || { q: 0, v: 0, estab: '' };
-      const d = (estabFiltro === 'TODOS' || item.estab === estabFiltro) ? item : { q: 0, v: 0 };
-      return acc + (temValor ? d.v : d.q);
-    }, 0);
-  });
-
-  instanciarGraficos[chartId] = new Chart(ctx, {
-    type: 'doughnut',
-    data: {
-      labels: linhas,
-      datasets: [{ data: dataValues, backgroundColor: PALETA_CORES.slice(0, linhas.length) }]
-    },
-    plugins: [pluginRotulosValores],
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      onClick: (e, el) => {
-        if (el.length > 0) selecionarGrupo(linhas[el[0].index]);
-      },
-      plugins: {
-        legend: { position: 'bottom', labels: { color: '#2d3748', font: { size: 9, weight: '500' } } }
-      }
-    }
-  });
-}
-
-function atualizarFiltrosEstaticos() {
-  const selAno = document.getElementById('filtroAno');
-  const anos = new Set();
-  Object.keys(bancoHistorico).forEach(p => anos.add(p.split(' ')[2]));
-  selAno.innerHTML = '<option value="TODOS">Todos os Anos</option>';
-  anos.forEach(a => selAno.innerHTML += `<option value="${a}">${a}</option>`);
-
-  const selEstab = document.getElementById('filtroEstabelecimento');
-  const estabelecimentos = new Set();
-  Object.keys(bancoHistorico).forEach(p => {
-    Object.keys(bancoHistorico[p]).forEach(secao => {
-      Object.keys(bancoHistorico[p][secao]).forEach(item => {
-        if (bancoHistorico[p][secao][item].estab) {
-          estabelecimentos.add(bancoHistorico[p][secao][item].estab);
-        }
-      });
-    });
-  });
-  selEstab.innerHTML = '<option value="TODOS">Todos os Estabelecimentos</option>';
-  Array.from(estabelecimentos).sort().forEach(e => selEstab.innerHTML += `<option value="${e}">${e}</option>`);
+  if (tbody) tbody.innerHTML = bodyHTML;
 }
 
 function renderizarTudo() {
   calcularKPIs();
-  renderizarTabelaEGráficos('tb41', 'chart41_bar', 'chart41_pie', '4.1', false);
-  renderizarTabelaEGráficos('tb421', 'chart421_bar', 'chart421_pie', '4.2.1', true);
-  renderizarTabelaEGráficos('tb422', 'chart422_bar', 'chart422_pie', '4.2.2', true);
-  renderizarTabelaEGráficos('tb431', 'chart431_bar', 'chart431_pie', '4.3.1', true);
-  renderizarTabelaEGráficos('tb441', 'chart441_bar', 'chart441_pie', '4.4.1', true);
-  renderizarTabelaEGráficos('tb442', 'chart442_bar', 'chart442_pie', '4.4.2', true);
-  renderizarTabelaEGráficos('tb46', 'chart46_bar', 'chart46_pie', '4.6', true);
+  renderizarTabelaEGráficos('tb41', '4.1', false);
+  renderizarTabelaEGráficos('tb421', '4.2.1', true);
+  renderizarTabelaEGráficos('tb422', '4.2.2', true);
+  renderizarTabelaEGráficos('tb431', '4.3.1', true);
+  renderizarTabelaEGráficos('tb441', '4.4.1', true);
+  renderizarTabelaEGráficos('tb442', '4.4.2', true);
+  renderizarTabelaEGráficos('tb46', '4.6', true);
 }
 
-function exportarParaSheets() {
-  let csvContent = "\uFEFF";
-  const elementos = document.querySelectorAll('[data-titulo], table');
-
-  elementos.forEach(el => {
-    if (el.hasAttribute('data-titulo')) {
-      csvContent += `\n"${el.getAttribute('data-titulo')}"\n`;
-    } else if (el.tagName === 'TABLE') {
-      const rows = el.querySelectorAll('tr');
-      rows.forEach(row => {
-        const cols = row.querySelectorAll('th, td');
-        const rowData = Array.from(cols).map(c => `"${c.innerText.replace(/"/g, '""')}"`);
-        csvContent += rowData.join(';') + '\n';
-      });
-    }
-  });
-
-  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.setAttribute('download', 'Relatorio_DigiSUS_Joinville.csv');
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
-
-function exportarParaDocs() {
-  let textContent = '';
-  const elementos = document.querySelectorAll('[data-titulo], table');
-
-  elementos.forEach(el => {
-    if (el.hasAttribute('data-titulo')) {
-      textContent += `\n### ${el.getAttribute('data-titulo')}\n\n`;
-    } else if (el.tagName === 'TABLE') {
-      const rows = el.querySelectorAll('tr');
-      rows.forEach((row, rIdx) => {
-        const cols = row.querySelectorAll('th, td');
-        const rowData = Array.from(cols).map(c => c.innerText.trim());
-        textContent += '| ' + rowData.join(' | ') + ' |\n';
-        if (rIdx === 0) {
-          textContent += '| ' + rowData.map(() => '---').join(' | ') + ' |\n';
-        }
-      });
-      textContent += '\n';
-    }
-  });
-
-  navigator.clipboard.writeText(textContent).then(() => {
-    alert('Conteúdo copiado em formato de tabela! Basta pressionar Ctrl + V no Google Docs ou Word.');
-  }).catch(() => {
-    alert('Falha ao acessar a área de transferência.');
-  });
-}
-
-window.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', () => {
   atualizarFiltrosEstaticos();
   renderizarTudo();
 });

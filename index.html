@@ -1208,6 +1208,34 @@ document.addEventListener('DOMContentLoaded', () => {
   atualizarFiltrosEstaticos();
   renderizarTudo();
 });
+  // Oculta os botões de ação apenas no ambiente publicado (GitHub Pages)
+window.addEventListener('DOMContentLoaded', () => {
+  const isOnline = window.location.hostname.includes('github.io');
+  
+  if (isOnline) {
+    // Busca o contêiner onde ficam os botões no cabeçalho e oculta
+    const acoesHeader = document.querySelector('.header-actions') || 
+                        document.querySelector('.actions') || 
+                        document.querySelector('.top-buttons');
+                        
+    if (acoesHeader) {
+      acoesHeader.style.display = 'none';
+    } else {
+      // Caso os botões não estejam num container agrupado, oculta individualmente pelas funções chamadas:
+      document.querySelectorAll('button').forEach(btn => {
+        const onclickAttr = btn.getAttribute('onclick') || '';
+        if (
+          onclickAttr.includes('abrirModal') || 
+          onclickAttr.includes('exportarJSON') || 
+          onclickAttr.includes('importarJSON') || 
+          onclickAttr.includes('limpar')
+        ) {
+          btn.style.display = 'none';
+        }
+      });
+    }
+  }
+});
 </script>
 </body>
 </html>

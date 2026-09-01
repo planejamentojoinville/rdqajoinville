@@ -274,7 +274,464 @@
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
-const DADOS_PADRAO = {};
+// 1. Cole todo o conteúdo do seu arquivo JSON exportado dentro das chaves de DADOS_PADRAO:
+const DADOS_PADRAO = {
+  "1º Quadri 2026": {
+    "4.1": {
+      "Atendimento Individual": {
+        "estab": "REDE UBS",
+        "q": 0,
+        "v": 0
+      },
+      "Atendimento Odontológico": {
+        "estab": "REDE UBS",
+        "q": 0,
+        "v": 0
+      },
+      "Procedimento": {
+        "estab": "REDE UBS",
+        "q": 0,
+        "v": 0
+      },
+      "Visita Domiciliar": {
+        "estab": "REDE UBS",
+        "q": 0,
+        "v": 0
+      }
+    },
+    "4.2.1": {
+      "03 - Procedimentos Clínicos": {
+        "estab": "2521296",
+        "q": 42265,
+        "v": 72055.60999998808
+      },
+      "02 - Procedimentos com Finalidade Diagnóstica": {
+        "estab": "2521296",
+        "q": 8500,
+        "v": 697561.4999999822
+      },
+      "04 - Procedimentos Cirúrgicos": {
+        "estab": "2521296",
+        "q": 2909,
+        "v": 75076.31000000189
+      },
+      "05 - Transplantes de Órgãos, Tecidos e Células": {
+        "estab": "3678385",
+        "q": 559,
+        "v": 187747.15000000043
+      },
+      "07 - Órteses, Próteses e Materiais Especiais": {
+        "estab": "3678385",
+        "q": 112,
+        "v": 56000
+      }
+    },
+    "4.2.2": {
+      "03 - Procedimentos Clínicos": {
+        "estab": "2436469",
+        "q": 3207,
+        "v": 6033882.399999993
+      },
+      "04 - Procedimentos Cirúrgicos": {
+        "estab": "2436469",
+        "q": 2483,
+        "v": 9436582.19000001
+      },
+      "02 - Procedimentos com Finalidade Diagnóstica": {
+        "estab": "2436469",
+        "q": 33,
+        "v": 60190.2
+      },
+      "05 - Transplantes de Órgãos, Tecidos e Células": {
+        "estab": "2436469",
+        "q": 145,
+        "v": 1041190.2100000001
+      }
+    },
+    "4.3.1": {
+      "03 - Procedimentos Clínicos": {
+        "estab": "2623102",
+        "q": 32264,
+        "v": 26957.319999999996
+      }
+    },
+    "4.4.1": {
+      "03 - Procedimentos Clínicos": {
+        "estab": "2521296",
+        "q": 1808181,
+        "v": 15507452.029993799
+      },
+      "02 - Procedimentos com Finalidade Diagnóstica": {
+        "estab": "2521296",
+        "q": 1556738,
+        "v": 14710560.759994164
+      },
+      "04 - Procedimentos Cirúrgicos": {
+        "estab": "2521296",
+        "q": 20009,
+        "v": 2378765.3400000697
+      },
+      "01 - Ações de Promoção e Prevenção em Saúde": {
+        "estab": "2623102",
+        "q": 12718,
+        "v": 1082.7
+      },
+      "07 - Órteses, Próteses e Materiais Especiais": {
+        "estab": "2511436",
+        "q": 798,
+        "v": 345630.91
+      },
+      "05 - Transplantes de Órgãos, Tecidos e Células": {
+        "estab": "3678385",
+        "q": 578,
+        "v": 195091.1500000004
+      },
+      "08 - Ações Complementares da Atenção à Saúde": {
+        "estab": "5374588",
+        "q": 29666,
+        "v": 146846.69999999265
+      }
+    },
+    "4.4.2": {
+      "04 - Procedimentos Cirúrgicos": {
+        "estab": "2521296",
+        "q": 6298,
+        "v": 24889577.82999992
+      },
+      "03 - Procedimentos Clínicos": {
+        "estab": "2436469",
+        "q": 3220,
+        "v": 6037796.319999991
+      },
+      "02 - Procedimentos com Finalidade Diagnóstica": {
+        "estab": "2436469",
+        "q": 34,
+        "v": 60407.67
+      },
+      "05 - Transplantes de Órgãos, Tecidos e Células": {
+        "estab": "2436469",
+        "q": 156,
+        "v": 1711302.2999999996
+      }
+    },
+    "4.6": {
+      "02 - Procedimentos com Finalidade Diagnóstica": {
+        "estab": "2521296",
+        "q": 4559,
+        "v": 0
+      },
+      "03 - Procedimentos Clínicos": {
+        "estab": "2511754",
+        "q": 85,
+        "v": 0
+      }
+    }
+  },
+  "2º Quadri 2026": {
+    "4.1": {
+      "Atendimento Individual": {
+        "estab": "REDE UBS",
+        "q": 0,
+        "v": 0
+      },
+      "Atendimento Odontológico": {
+        "estab": "REDE UBS",
+        "q": 0,
+        "v": 0
+      },
+      "Procedimento": {
+        "estab": "REDE UBS",
+        "q": 0,
+        "v": 0
+      },
+      "Visita Domiciliar": {
+        "estab": "REDE UBS",
+        "q": 0,
+        "v": 0
+      }
+    },
+    "4.2.1": {
+      "03 - Procedimentos Clínicos": {
+        "estab": "2521296",
+        "q": 42265,
+        "v": 72055.60999998808
+      },
+      "02 - Procedimentos com Finalidade Diagnóstica": {
+        "estab": "2521296",
+        "q": 8500,
+        "v": 697561.4999999822
+      },
+      "04 - Procedimentos Cirúrgicos": {
+        "estab": "2521296",
+        "q": 2909,
+        "v": 75076.31000000189
+      },
+      "05 - Transplantes de Órgãos, Tecidos e Células": {
+        "estab": "3678385",
+        "q": 559,
+        "v": 187747.15000000043
+      },
+      "07 - Órteses, Próteses e Materiais Especiais": {
+        "estab": "3678385",
+        "q": 112,
+        "v": 56000
+      }
+    },
+    "4.2.2": {
+      "03 - Procedimentos Clínicos": {
+        "estab": "2436469",
+        "q": 3207,
+        "v": 6033882.399999993
+      },
+      "04 - Procedimentos Cirúrgicos": {
+        "estab": "2436469",
+        "q": 2483,
+        "v": 9436582.19000001
+      },
+      "02 - Procedimentos com Finalidade Diagnóstica": {
+        "estab": "2436469",
+        "q": 33,
+        "v": 60190.2
+      },
+      "05 - Transplantes de Órgãos, Tecidos e Células": {
+        "estab": "2436469",
+        "q": 145,
+        "v": 1041190.2100000001
+      }
+    },
+    "4.3.1": {
+      "03 - Procedimentos Clínicos": {
+        "estab": "2623102",
+        "q": 32264,
+        "v": 26957.319999999996
+      }
+    },
+    "4.4.1": {
+      "03 - Procedimentos Clínicos": {
+        "estab": "2521296",
+        "q": 1808181,
+        "v": 15507452.029993799
+      },
+      "02 - Procedimentos com Finalidade Diagnóstica": {
+        "estab": "2521296",
+        "q": 1556738,
+        "v": 14710560.759994164
+      },
+      "04 - Procedimentos Cirúrgicos": {
+        "estab": "2521296",
+        "q": 20009,
+        "v": 2378765.3400000697
+      },
+      "01 - Ações de Promoção e Prevenção em Saúde": {
+        "estab": "2623102",
+        "q": 12718,
+        "v": 1082.7
+      },
+      "07 - Órteses, Próteses e Materiais Especiais": {
+        "estab": "2511436",
+        "q": 798,
+        "v": 345630.91
+      },
+      "05 - Transplantes de Órgãos, Tecidos e Células": {
+        "estab": "3678385",
+        "q": 578,
+        "v": 195091.1500000004
+      },
+      "08 - Ações Complementares da Atenção à Saúde": {
+        "estab": "5374588",
+        "q": 29666,
+        "v": 146846.69999999265
+      }
+    },
+    "4.4.2": {
+      "04 - Procedimentos Cirúrgicos": {
+        "estab": "2521296",
+        "q": 6298,
+        "v": 24889577.82999992
+      },
+      "03 - Procedimentos Clínicos": {
+        "estab": "2436469",
+        "q": 3220,
+        "v": 6037796.319999991
+      },
+      "02 - Procedimentos com Finalidade Diagnóstica": {
+        "estab": "2436469",
+        "q": 34,
+        "v": 60407.67
+      },
+      "05 - Transplantes de Órgãos, Tecidos e Células": {
+        "estab": "2436469",
+        "q": 156,
+        "v": 1711302.2999999996
+      }
+    },
+    "4.6": {
+      "02 - Procedimentos com Finalidade Diagnóstica": {
+        "estab": "2521296",
+        "q": 4559,
+        "v": 0
+      },
+      "03 - Procedimentos Clínicos": {
+        "estab": "2511754",
+        "q": 85,
+        "v": 0
+      }
+    }
+  },
+  "3º Quadri 2026": {
+    "4.1": {
+      "Atendimento Individual": {
+        "estab": "REDE UBS",
+        "q": 0,
+        "v": 0
+      },
+      "Atendimento Odontológico": {
+        "estab": "REDE UBS",
+        "q": 0,
+        "v": 0
+      },
+      "Procedimento": {
+        "estab": "REDE UBS",
+        "q": 0,
+        "v": 0
+      },
+      "Visita Domiciliar": {
+        "estab": "REDE UBS",
+        "q": 0,
+        "v": 0
+      }
+    },
+    "4.2.1": {
+      "03 - Procedimentos Clínicos": {
+        "estab": "2521296",
+        "q": 42265,
+        "v": 72055.60999998808
+      },
+      "02 - Procedimentos com Finalidade Diagnóstica": {
+        "estab": "2521296",
+        "q": 8500,
+        "v": 697561.4999999822
+      },
+      "04 - Procedimentos Cirúrgicos": {
+        "estab": "2521296",
+        "q": 2909,
+        "v": 75076.31000000189
+      },
+      "05 - Transplantes de Órgãos, Tecidos e Células": {
+        "estab": "3678385",
+        "q": 559,
+        "v": 187747.15000000043
+      },
+      "07 - Órteses, Próteses e Materiais Especiais": {
+        "estab": "3678385",
+        "q": 112,
+        "v": 56000
+      }
+    },
+    "4.2.2": {
+      "03 - Procedimentos Clínicos": {
+        "estab": "2436469",
+        "q": 3207,
+        "v": 6033882.399999993
+      },
+      "04 - Procedimentos Cirúrgicos": {
+        "estab": "2436469",
+        "q": 2483,
+        "v": 9436582.19000001
+      },
+      "02 - Procedimentos com Finalidade Diagnóstica": {
+        "estab": "2436469",
+        "q": 33,
+        "v": 60190.2
+      },
+      "05 - Transplantes de Órgãos, Tecidos e Células": {
+        "estab": "2436469",
+        "q": 145,
+        "v": 1041190.2100000001
+      }
+    },
+    "4.3.1": {
+      "03 - Procedimentos Clínicos": {
+        "estab": "2623102",
+        "q": 32264,
+        "v": 26957.319999999996
+      }
+    },
+    "4.4.1": {
+      "03 - Procedimentos Clínicos": {
+        "estab": "2521296",
+        "q": 1808181,
+        "v": 15507452.029993799
+      },
+      "02 - Procedimentos com Finalidade Diagnóstica": {
+        "estab": "2521296",
+        "q": 1556738,
+        "v": 14710560.759994164
+      },
+      "04 - Procedimentos Cirúrgicos": {
+        "estab": "2521296",
+        "q": 20009,
+        "v": 2378765.3400000697
+      },
+      "01 - Ações de Promoção e Prevenção em Saúde": {
+        "estab": "2623102",
+        "q": 12718,
+        "v": 1082.7
+      },
+      "07 - Órteses, Próteses e Materiais Especiais": {
+        "estab": "2511436",
+        "q": 798,
+        "v": 345630.91
+      },
+      "05 - Transplantes de Órgãos, Tecidos e Células": {
+        "estab": "3678385",
+        "q": 578,
+        "v": 195091.1500000004
+      },
+      "08 - Ações Complementares da Atenção à Saúde": {
+        "estab": "5374588",
+        "q": 29666,
+        "v": 146846.69999999265
+      }
+    },
+    "4.4.2": {
+      "04 - Procedimentos Cirúrgicos": {
+        "estab": "2521296",
+        "q": 6298,
+        "v": 24889577.82999992
+      },
+      "03 - Procedimentos Clínicos": {
+        "estab": "2436469",
+        "q": 3220,
+        "v": 6037796.319999991
+      },
+      "02 - Procedimentos com Finalidade Diagnóstica": {
+        "estab": "2436469",
+        "q": 34,
+        "v": 60407.67
+      },
+      "05 - Transplantes de Órgãos, Tecidos e Células": {
+        "estab": "2436469",
+        "q": 156,
+        "v": 1711302.2999999996
+      }
+    },
+    "4.6": {
+      "02 - Procedimentos com Finalidade Diagnóstica": {
+        "estab": "2521296",
+        "q": 4559,
+        "v": 0
+      },
+      "03 - Procedimentos Clínicos": {
+        "estab": "2511754",
+        "q": 85,
+        "v": 0
+      }
+    }
+  }
+};
+
+// 2. Altere esta linha para usar DADOS_PADRAO diretamente (removendo a leitura do localStorage):
 let bancoHistorico = JSON.parse(localStorage.getItem('digisus_historico_v3')) || DADOS_PADRAO;
 let grupoSelecionado = null;
 let registrosSIA = [];

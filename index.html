@@ -49,6 +49,7 @@
     table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.88em; margin-bottom: 15px; }
     th, td { padding: 9px 12px; border: 1px solid var(--line); }
     th { background-color: var(--primary); color: #ffffff; font-weight: 600; }
+    tfoot tr { background-color: #e6f0fa; font-weight: bold; border-top: 2px solid var(--primary-dark); }
     tr.clickable-row { cursor: pointer; transition: background 0.2s; }
     tr.clickable-row:hover { background-color: #e8f4fd; }
     tr.selected-row { background-color: #bee3f8 !important; font-weight: bold; color: #003358; }
@@ -56,7 +57,6 @@
     .btn-clear-filter { background: var(--red); color: #fff; border: none; padding: 6px 12px; border-radius: 4px; cursor: pointer; font-size: 0.8em; margin-left: auto; font-weight: bold; }
     h5 { color: var(--primary-dark); }
 
-    /* MODAL E DROPZONE */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); display: none; justify-content: center; align-items: center; z-index: 9999; }
     .modal-content { background: #2d3748; color: #f7fafc; padding: 25px; border-radius: 10px; width: 550px; max-width: 92%; box-shadow: 0 10px 25px rgba(0,0,0,0.3); max-height: 90vh; overflow-y: auto; }
     .modal-content h3 { margin-top: 0; color: #f6ad55; border-bottom: 1px solid #4a5568; padding-bottom: 10px; }
@@ -67,15 +67,7 @@
     .modal-section { border-top: 1px dashed #4a5568; padding-top: 10px; margin-top: 15px; }
     .modal-section-title { font-size: 0.9em; font-weight: bold; color: #f6ad55; margin-bottom: 8px; }
     
-    .dropzone-box {
-      border: 2px dashed #f6ad55;
-      border-radius: 8px;
-      padding: 15px;
-      text-align: center;
-      background: #1a202c;
-      cursor: pointer;
-      transition: all 0.2s ease;
-    }
+    .dropzone-box { border: 2px dashed #f6ad55; border-radius: 8px; padding: 15px; text-align: center; background: #1a202c; cursor: pointer; transition: all 0.2s ease; }
     .dropzone-box:hover, .dropzone-box.dragover { background: #2a3447; border-color: #68d391; }
     .dropzone-box p { margin: 0 0 5px 0; font-size: 0.85em; color: #cbd5e0; }
     .dropzone-box span { font-size: 0.75em; color: #a0aec0; }
@@ -102,10 +94,11 @@
       <span>Relatório Consolidado de Produção da Saúde</span>
     </div>
     <div class="header-actions">
-      <button class="btn-header btn-add" onclick="abrirModal()">📂 Add Quadri</button>
+      <button class="btn-header btn-add" onclick="abrirModal()">📂 Add/Editar Quadri</button>
       <button class="btn-header btn-exp" onclick="exportarJSON()">📤 Exportar JSON</button>
       <button class="btn-header btn-imp" onclick="document.getElementById('inputImportJSON').click()">📥 Importar JSON</button>
       <input type="file" id="inputImportJSON" style="display:none" accept=".json" onchange="importarJSON(event)">
+      <button class="btn-header btn-del" onclick="abrirModalExcluir()">🗑️ Excluir Quadri</button>
       <button class="btn-header btn-del" onclick="limparBancoData()">🗑️ Limpar</button>
     </div>
   </div>
@@ -202,21 +195,23 @@
 <div class="modal-overlay" id="modalAdd">
   <div class="modal-content">
     <h3>Carregar Dados do Quadrimestre</h3>
-    
+
     <div class="form-row">
       <div class="form-group" style="flex:1;">
         <label>Ano</label>
-        <input type="number" id="modalAno" value="2026">
+        <input type="number" id="modalAno" value="2026" onchange="verificarQuadriExistente()">
       </div>
       <div class="form-group" style="flex:1;">
         <label>Quadrimestre</label>
-        <select id="modalQuadri">
+        <select id="modalQuadri" onchange="verificarQuadriExistente()">
           <option value="1º Quadri">1º Quadrimestre</option>
           <option value="2º Quadri" selected>2º Quadrimestre</option>
           <option value="3º Quadri">3º Quadrimestre</option>
         </select>
       </div>
     </div>
+
+    <div id="avisoEdicao" class="status-msg" style="display:none; background:rgba(246,173,85,0.15); border:1px solid #f6ad55; color:#f6ad55; padding:8px 10px; border-radius:6px; margin-bottom:10px;"></div>
 
     <div class="modal-section">
       <div class="modal-section-title">1. ATENÇÃO BÁSICA (DIGITAÇÃO MANUAL)</div>
@@ -251,6 +246,7 @@
       </div>
       <div class="progress-bar-bg" id="progressBgSIA"><div class="progress-bar-fill" id="progressFillSIA"></div></div>
       <div id="msgSIA" class="status-msg"></div>
+      <div style="font-size:0.75em; color:#94a3b8; margin-top:4px;">⚠️ Subir um novo arquivo aqui substitui os dados de SIA (4.2.1, 4.3.1, 4.4.1 e 4.6) já salvos deste quadrimestre. Se não subir nada, os dados atuais de SIA são mantidos.</div>
     </div>
 
     <div class="modal-section">
@@ -262,6 +258,7 @@
       </div>
       <div class="progress-bar-bg" id="progressBgSIH"><div class="progress-bar-fill" id="progressFillSIH"></div></div>
       <div id="msgSIH" class="status-msg"></div>
+      <div style="font-size:0.75em; color:#94a3b8; margin-top:4px;">⚠️ Subir um novo arquivo aqui substitui os dados de SIH (4.2.2 e 4.4.2) já salvos deste quadrimestre. Se não subir nada, os dados atuais de SIH são mantidos.</div>
     </div>
 
     <div class="modal-actions">
@@ -271,471 +268,164 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="modalExcluir">
+  <div class="modal-content" style="width:420px;">
+    <h3>🗑️ Excluir Quadrimestre</h3>
+    <div class="form-group">
+      <label>Selecione o quadrimestre para excluir</label>
+      <select id="selectExcluir" style="width:100%;"></select>
+    </div>
+    <p style="font-size:0.8em; color:#fca5a5; margin-top:10px;">⚠️ Esta ação apaga permanentemente todos os dados (Atenção Básica, SIA e SIH) desse quadrimestre e não pode ser desfeita.</p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="fecharModalExcluir()">Cancelar</button>
+      <button class="btn-save" style="background:#dc2626;" onclick="confirmarExclusaoQuadrimestre()">Excluir Definitivamente</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast-container" id="toastContainer"></div>
 
 <script>
-// 1. Cole todo o conteúdo do seu arquivo JSON exportado dentro das chaves de DADOS_PADRAO:
 const DADOS_PADRAO = {
   "1º Quadri 2026": {
     "4.1": {
-      "Atendimento Individual": {
-        "estab": "REDE UBS",
-        "q": 0,
-        "v": 0
-      },
-      "Atendimento Odontológico": {
-        "estab": "REDE UBS",
-        "q": 0,
-        "v": 0
-      },
-      "Procedimento": {
-        "estab": "REDE UBS",
-        "q": 0,
-        "v": 0
-      },
-      "Visita Domiciliar": {
-        "estab": "REDE UBS",
-        "q": 0,
-        "v": 0
-      }
+      "Atendimento Individual": { "estab": "REDE UBS", "q": 0, "v": 0 },
+      "Atendimento Odontológico": { "estab": "REDE UBS", "q": 0, "v": 0 },
+      "Procedimento": { "estab": "REDE UBS", "q": 0, "v": 0 },
+      "Visita Domiciliar": { "estab": "REDE UBS", "q": 0, "v": 0 }
     },
     "4.2.1": {
-      "03 - Procedimentos Clínicos": {
-        "estab": "2521296",
-        "q": 42265,
-        "v": 72055.60999998808
-      },
-      "02 - Procedimentos com Finalidade Diagnóstica": {
-        "estab": "2521296",
-        "q": 8500,
-        "v": 697561.4999999822
-      },
-      "04 - Procedimentos Cirúrgicos": {
-        "estab": "2521296",
-        "q": 2909,
-        "v": 75076.31000000189
-      },
-      "05 - Transplantes de Órgãos, Tecidos e Células": {
-        "estab": "3678385",
-        "q": 559,
-        "v": 187747.15000000043
-      },
-      "07 - Órteses, Próteses e Materiais Especiais": {
-        "estab": "3678385",
-        "q": 112,
-        "v": 56000
-      }
+      "03 - Procedimentos Clínicos": { "estab": "2521296", "q": 42265, "v": 72055.61 },
+      "02 - Procedimentos com Finalidade Diagnóstica": { "estab": "2521296", "q": 8500, "v": 697561.50 },
+      "04 - Procedimentos Cirúrgicos": { "estab": "2521296", "q": 2909, "v": 75076.31 },
+      "05 - Transplantes de Órgãos, Tecidos e Células": { "estab": "3678385", "q": 559, "v": 187747.15 },
+      "07 - Órteses, Próteses e Materiais Especiais": { "estab": "3678385", "q": 112, "v": 56000 }
     },
     "4.2.2": {
-      "03 - Procedimentos Clínicos": {
-        "estab": "2436469",
-        "q": 3207,
-        "v": 6033882.399999993
-      },
-      "04 - Procedimentos Cirúrgicos": {
-        "estab": "2436469",
-        "q": 2483,
-        "v": 9436582.19000001
-      },
-      "02 - Procedimentos com Finalidade Diagnóstica": {
-        "estab": "2436469",
-        "q": 33,
-        "v": 60190.2
-      },
-      "05 - Transplantes de Órgãos, Tecidos e Células": {
-        "estab": "2436469",
-        "q": 145,
-        "v": 1041190.2100000001
-      }
+      "03 - Procedimentos Clínicos": { "estab": "2436469", "q": 3207, "v": 6033882.40 },
+      "04 - Procedimentos Cirúrgicos": { "estab": "2436469", "q": 2483, "v": 9436582.19 },
+      "02 - Procedimentos com Finalidade Diagnóstica": { "estab": "2436469", "q": 33, "v": 60190.20 },
+      "05 - Transplantes de Órgãos, Tecidos e Células": { "estab": "2436469", "q": 145, "v": 1041190.21 }
     },
     "4.3.1": {
-      "03 - Procedimentos Clínicos": {
-        "estab": "2623102",
-        "q": 32264,
-        "v": 26957.319999999996
-      }
+      "03 - Procedimentos Clínicos": { "estab": "2623102", "q": 32264, "v": 26957.32 }
     },
     "4.4.1": {
-      "03 - Procedimentos Clínicos": {
-        "estab": "2521296",
-        "q": 1808181,
-        "v": 15507452.029993799
-      },
-      "02 - Procedimentos com Finalidade Diagnóstica": {
-        "estab": "2521296",
-        "q": 1556738,
-        "v": 14710560.759994164
-      },
-      "04 - Procedimentos Cirúrgicos": {
-        "estab": "2521296",
-        "q": 20009,
-        "v": 2378765.3400000697
-      },
-      "01 - Ações de Promoção e Prevenção em Saúde": {
-        "estab": "2623102",
-        "q": 12718,
-        "v": 1082.7
-      },
-      "07 - Órteses, Próteses e Materiais Especiais": {
-        "estab": "2511436",
-        "q": 798,
-        "v": 345630.91
-      },
-      "05 - Transplantes de Órgãos, Tecidos e Células": {
-        "estab": "3678385",
-        "q": 578,
-        "v": 195091.1500000004
-      },
-      "08 - Ações Complementares da Atenção à Saúde": {
-        "estab": "5374588",
-        "q": 29666,
-        "v": 146846.69999999265
-      }
+      "03 - Procedimentos Clínicos": { "estab": "2521296", "q": 1808181, "v": 15507452.03 },
+      "02 - Procedimentos com Finalidade Diagnóstica": { "estab": "2521296", "q": 1556738, "v": 14710560.76 },
+      "04 - Procedimentos Cirúrgicos": { "estab": "2521296", "q": 20009, "v": 2378765.34 },
+      "01 - Ações de Promoção e Prevenção em Saúde": { "estab": "2623102", "q": 12718, "v": 1082.70 },
+      "07 - Órteses, Próteses e Materiais Especiais": { "estab": "2511436", "q": 798, "v": 345630.91 },
+      "05 - Transplantes de Órgãos, Tecidos e Células": { "estab": "3678385", "q": 578, "v": 195091.15 },
+      "08 - Ações Complementares da Atenção à Saúde": { "estab": "5374588", "q": 29666, "v": 146846.70 }
     },
     "4.4.2": {
-      "04 - Procedimentos Cirúrgicos": {
-        "estab": "2521296",
-        "q": 6298,
-        "v": 24889577.82999992
-      },
-      "03 - Procedimentos Clínicos": {
-        "estab": "2436469",
-        "q": 3220,
-        "v": 6037796.319999991
-      },
-      "02 - Procedimentos com Finalidade Diagnóstica": {
-        "estab": "2436469",
-        "q": 34,
-        "v": 60407.67
-      },
-      "05 - Transplantes de Órgãos, Tecidos e Células": {
-        "estab": "2436469",
-        "q": 156,
-        "v": 1711302.2999999996
-      }
+      "04 - Procedimentos Cirúrgicos": { "estab": "2521296", "q": 6298, "v": 24889577.83 },
+      "03 - Procedimentos Clínicos": { "estab": "2436469", "q": 3220, "v": 6037796.32 },
+      "02 - Procedimentos com Finalidade Diagnóstica": { "estab": "2436469", "q": 34, "v": 60407.67 },
+      "05 - Transplantes de Órgãos, Tecidos e Células": { "estab": "2436469", "q": 156, "v": 1711302.30 }
     },
     "4.6": {
-      "02 - Procedimentos com Finalidade Diagnóstica": {
-        "estab": "2521296",
-        "q": 4559,
-        "v": 0
-      },
-      "03 - Procedimentos Clínicos": {
-        "estab": "2511754",
-        "q": 85,
-        "v": 0
-      }
+      "02 - Procedimentos com Finalidade Diagnóstica": { "estab": "2521296", "q": 4559, "v": 0 },
+      "03 - Procedimentos Clínicos": { "estab": "2511754", "q": 85, "v": 0 }
     }
   },
   "2º Quadri 2026": {
     "4.1": {
-      "Atendimento Individual": {
-        "estab": "REDE UBS",
-        "q": 0,
-        "v": 0
-      },
-      "Atendimento Odontológico": {
-        "estab": "REDE UBS",
-        "q": 0,
-        "v": 0
-      },
-      "Procedimento": {
-        "estab": "REDE UBS",
-        "q": 0,
-        "v": 0
-      },
-      "Visita Domiciliar": {
-        "estab": "REDE UBS",
-        "q": 0,
-        "v": 0
-      }
+      "Atendimento Individual": { "estab": "REDE UBS", "q": 0, "v": 0 },
+      "Atendimento Odontológico": { "estab": "REDE UBS", "q": 0, "v": 0 },
+      "Procedimento": { "estab": "REDE UBS", "q": 0, "v": 0 },
+      "Visita Domiciliar": { "estab": "REDE UBS", "q": 0, "v": 0 }
     },
     "4.2.1": {
-      "03 - Procedimentos Clínicos": {
-        "estab": "2521296",
-        "q": 42265,
-        "v": 72055.60999998808
-      },
-      "02 - Procedimentos com Finalidade Diagnóstica": {
-        "estab": "2521296",
-        "q": 8500,
-        "v": 697561.4999999822
-      },
-      "04 - Procedimentos Cirúrgicos": {
-        "estab": "2521296",
-        "q": 2909,
-        "v": 75076.31000000189
-      },
-      "05 - Transplantes de Órgãos, Tecidos e Células": {
-        "estab": "3678385",
-        "q": 559,
-        "v": 187747.15000000043
-      },
-      "07 - Órteses, Próteses e Materiais Especiais": {
-        "estab": "3678385",
-        "q": 112,
-        "v": 56000
-      }
+      "03 - Procedimentos Clínicos": { "estab": "2521296", "q": 42265, "v": 72055.61 },
+      "02 - Procedimentos com Finalidade Diagnóstica": { "estab": "2521296", "q": 8500, "v": 697561.50 },
+      "04 - Procedimentos Cirúrgicos": { "estab": "2521296", "q": 2909, "v": 75076.31 },
+      "05 - Transplantes de Órgãos, Tecidos e Células": { "estab": "3678385", "q": 559, "v": 187747.15 },
+      "07 - Órteses, Próteses e Materiais Especiais": { "estab": "3678385", "q": 112, "v": 56000 }
     },
     "4.2.2": {
-      "03 - Procedimentos Clínicos": {
-        "estab": "2436469",
-        "q": 3207,
-        "v": 6033882.399999993
-      },
-      "04 - Procedimentos Cirúrgicos": {
-        "estab": "2436469",
-        "q": 2483,
-        "v": 9436582.19000001
-      },
-      "02 - Procedimentos com Finalidade Diagnóstica": {
-        "estab": "2436469",
-        "q": 33,
-        "v": 60190.2
-      },
-      "05 - Transplantes de Órgãos, Tecidos e Células": {
-        "estab": "2436469",
-        "q": 145,
-        "v": 1041190.2100000001
-      }
+      "03 - Procedimentos Clínicos": { "estab": "2436469", "q": 3207, "v": 6033882.40 },
+      "04 - Procedimentos Cirúrgicos": { "estab": "2436469", "q": 2483, "v": 9436582.19 },
+      "02 - Procedimentos com Finalidade Diagnóstica": { "estab": "2436469", "q": 33, "v": 60190.20 },
+      "05 - Transplantes de Órgãos, Tecidos e Células": { "estab": "2436469", "q": 145, "v": 1041190.21 }
     },
     "4.3.1": {
-      "03 - Procedimentos Clínicos": {
-        "estab": "2623102",
-        "q": 32264,
-        "v": 26957.319999999996
-      }
+      "03 - Procedimentos Clínicos": { "estab": "2623102", "q": 32264, "v": 26957.32 }
     },
     "4.4.1": {
-      "03 - Procedimentos Clínicos": {
-        "estab": "2521296",
-        "q": 1808181,
-        "v": 15507452.029993799
-      },
-      "02 - Procedimentos com Finalidade Diagnóstica": {
-        "estab": "2521296",
-        "q": 1556738,
-        "v": 14710560.759994164
-      },
-      "04 - Procedimentos Cirúrgicos": {
-        "estab": "2521296",
-        "q": 20009,
-        "v": 2378765.3400000697
-      },
-      "01 - Ações de Promoção e Prevenção em Saúde": {
-        "estab": "2623102",
-        "q": 12718,
-        "v": 1082.7
-      },
-      "07 - Órteses, Próteses e Materiais Especiais": {
-        "estab": "2511436",
-        "q": 798,
-        "v": 345630.91
-      },
-      "05 - Transplantes de Órgãos, Tecidos e Células": {
-        "estab": "3678385",
-        "q": 578,
-        "v": 195091.1500000004
-      },
-      "08 - Ações Complementares da Atenção à Saúde": {
-        "estab": "5374588",
-        "q": 29666,
-        "v": 146846.69999999265
-      }
+      "03 - Procedimentos Clínicos": { "estab": "2521296", "q": 1808181, "v": 15507452.03 },
+      "02 - Procedimentos com Finalidade Diagnóstica": { "estab": "2521296", "q": 1556738, "v": 14710560.76 },
+      "04 - Procedimentos Cirúrgicos": { "estab": "2521296", "q": 20009, "v": 2378765.34 },
+      "01 - Ações de Promoção e Prevenção em Saúde": { "estab": "2623102", "q": 12718, "v": 1082.70 },
+      "07 - Órteses, Próteses e Materiais Especiais": { "estab": "2511436", "q": 798, "v": 345630.91 },
+      "05 - Transplantes de Órgãos, Tecidos e Células": { "estab": "3678385", "q": 578, "v": 195091.15 },
+      "08 - Ações Complementares da Atenção à Saúde": { "estab": "5374588", "q": 29666, "v": 146846.70 }
     },
     "4.4.2": {
-      "04 - Procedimentos Cirúrgicos": {
-        "estab": "2521296",
-        "q": 6298,
-        "v": 24889577.82999992
-      },
-      "03 - Procedimentos Clínicos": {
-        "estab": "2436469",
-        "q": 3220,
-        "v": 6037796.319999991
-      },
-      "02 - Procedimentos com Finalidade Diagnóstica": {
-        "estab": "2436469",
-        "q": 34,
-        "v": 60407.67
-      },
-      "05 - Transplantes de Órgãos, Tecidos e Células": {
-        "estab": "2436469",
-        "q": 156,
-        "v": 1711302.2999999996
-      }
+      "04 - Procedimentos Cirúrgicos": { "estab": "2521296", "q": 6298, "v": 24889577.83 },
+      "03 - Procedimentos Clínicos": { "estab": "2436469", "q": 3220, "v": 6037796.32 },
+      "02 - Procedimentos com Finalidade Diagnóstica": { "estab": "2436469", "q": 34, "v": 60407.67 },
+      "05 - Transplantes de Órgãos, Tecidos e Células": { "estab": "2436469", "q": 156, "v": 1711302.30 }
     },
     "4.6": {
-      "02 - Procedimentos com Finalidade Diagnóstica": {
-        "estab": "2521296",
-        "q": 4559,
-        "v": 0
-      },
-      "03 - Procedimentos Clínicos": {
-        "estab": "2511754",
-        "q": 85,
-        "v": 0
-      }
+      "02 - Procedimentos com Finalidade Diagnóstica": { "estab": "2521296", "q": 4559, "v": 0 },
+      "03 - Procedimentos Clínicos": { "estab": "2511754", "q": 85, "v": 0 }
     }
   },
   "3º Quadri 2026": {
     "4.1": {
-      "Atendimento Individual": {
-        "estab": "REDE UBS",
-        "q": 0,
-        "v": 0
-      },
-      "Atendimento Odontológico": {
-        "estab": "REDE UBS",
-        "q": 0,
-        "v": 0
-      },
-      "Procedimento": {
-        "estab": "REDE UBS",
-        "q": 0,
-        "v": 0
-      },
-      "Visita Domiciliar": {
-        "estab": "REDE UBS",
-        "q": 0,
-        "v": 0
-      }
+      "Atendimento Individual": { "estab": "REDE UBS", "q": 0, "v": 0 },
+      "Atendimento Odontológico": { "estab": "REDE UBS", "q": 0, "v": 0 },
+      "Procedimento": { "estab": "REDE UBS", "q": 0, "v": 0 },
+      "Visita Domiciliar": { "estab": "REDE UBS", "q": 0, "v": 0 }
     },
     "4.2.1": {
-      "03 - Procedimentos Clínicos": {
-        "estab": "2521296",
-        "q": 42265,
-        "v": 72055.60999998808
-      },
-      "02 - Procedimentos com Finalidade Diagnóstica": {
-        "estab": "2521296",
-        "q": 8500,
-        "v": 697561.4999999822
-      },
-      "04 - Procedimentos Cirúrgicos": {
-        "estab": "2521296",
-        "q": 2909,
-        "v": 75076.31000000189
-      },
-      "05 - Transplantes de Órgãos, Tecidos e Células": {
-        "estab": "3678385",
-        "q": 559,
-        "v": 187747.15000000043
-      },
-      "07 - Órteses, Próteses e Materiais Especiais": {
-        "estab": "3678385",
-        "q": 112,
-        "v": 56000
-      }
+      "03 - Procedimentos Clínicos": { "estab": "2521296", "q": 42265, "v": 72055.61 },
+      "02 - Procedimentos com Finalidade Diagnóstica": { "estab": "2521296", "q": 8500, "v": 697561.50 },
+      "04 - Procedimentos Cirúrgicos": { "estab": "2521296", "q": 2909, "v": 75076.31 },
+      "05 - Transplantes de Órgãos, Tecidos e Células": { "estab": "3678385", "q": 559, "v": 187747.15 },
+      "07 - Órteses, Próteses e Materiais Especiais": { "estab": "3678385", "q": 112, "v": 56000 }
     },
     "4.2.2": {
-      "03 - Procedimentos Clínicos": {
-        "estab": "2436469",
-        "q": 3207,
-        "v": 6033882.399999993
-      },
-      "04 - Procedimentos Cirúrgicos": {
-        "estab": "2436469",
-        "q": 2483,
-        "v": 9436582.19000001
-      },
-      "02 - Procedimentos com Finalidade Diagnóstica": {
-        "estab": "2436469",
-        "q": 33,
-        "v": 60190.2
-      },
-      "05 - Transplantes de Órgãos, Tecidos e Células": {
-        "estab": "2436469",
-        "q": 145,
-        "v": 1041190.2100000001
-      }
+      "03 - Procedimentos Clínicos": { "estab": "2436469", "q": 3207, "v": 6033882.40 },
+      "04 - Procedimentos Cirúrgicos": { "estab": "2436469", "q": 2483, "v": 9436582.19 },
+      "02 - Procedimentos com Finalidade Diagnóstica": { "estab": "2436469", "q": 33, "v": 60190.20 },
+      "05 - Transplantes de Órgãos, Tecidos e Células": { "estab": "2436469", "q": 145, "v": 1041190.21 }
     },
     "4.3.1": {
-      "03 - Procedimentos Clínicos": {
-        "estab": "2623102",
-        "q": 32264,
-        "v": 26957.319999999996
-      }
+      "03 - Procedimentos Clínicos": { "estab": "2623102", "q": 32264, "v": 26957.32 }
     },
     "4.4.1": {
-      "03 - Procedimentos Clínicos": {
-        "estab": "2521296",
-        "q": 1808181,
-        "v": 15507452.029993799
-      },
-      "02 - Procedimentos com Finalidade Diagnóstica": {
-        "estab": "2521296",
-        "q": 1556738,
-        "v": 14710560.759994164
-      },
-      "04 - Procedimentos Cirúrgicos": {
-        "estab": "2521296",
-        "q": 20009,
-        "v": 2378765.3400000697
-      },
-      "01 - Ações de Promoção e Prevenção em Saúde": {
-        "estab": "2623102",
-        "q": 12718,
-        "v": 1082.7
-      },
-      "07 - Órteses, Próteses e Materiais Especiais": {
-        "estab": "2511436",
-        "q": 798,
-        "v": 345630.91
-      },
-      "05 - Transplantes de Órgãos, Tecidos e Células": {
-        "estab": "3678385",
-        "q": 578,
-        "v": 195091.1500000004
-      },
-      "08 - Ações Complementares da Atenção à Saúde": {
-        "estab": "5374588",
-        "q": 29666,
-        "v": 146846.69999999265
-      }
+      "03 - Procedimentos Clínicos": { "estab": "2521296", "q": 1808181, "v": 15507452.03 },
+      "02 - Procedimentos com Finalidade Diagnóstica": { "estab": "2521296", "q": 1556738, "v": 14710560.76 },
+      "04 - Procedimentos Cirúrgicos": { "estab": "2521296", "q": 20009, "v": 2378765.34 },
+      "01 - Ações de Promoção e Prevenção em Saúde": { "estab": "2623102", "q": 12718, "v": 1082.70 },
+      "07 - Órteses, Próteses e Materiais Especiais": { "estab": "2511436", "q": 798, "v": 345630.91 },
+      "05 - Transplantes de Órgãos, Tecidos e Células": { "estab": "3678385", "q": 578, "v": 195091.15 },
+      "08 - Ações Complementares da Atenção à Saúde": { "estab": "5374588", "q": 29666, "v": 146846.70 }
     },
     "4.4.2": {
-      "04 - Procedimentos Cirúrgicos": {
-        "estab": "2521296",
-        "q": 6298,
-        "v": 24889577.82999992
-      },
-      "03 - Procedimentos Clínicos": {
-        "estab": "2436469",
-        "q": 3220,
-        "v": 6037796.319999991
-      },
-      "02 - Procedimentos com Finalidade Diagnóstica": {
-        "estab": "2436469",
-        "q": 34,
-        "v": 60407.67
-      },
-      "05 - Transplantes de Órgãos, Tecidos e Células": {
-        "estab": "2436469",
-        "q": 156,
-        "v": 1711302.2999999996
-      }
+      "04 - Procedimentos Cirúrgicos": { "estab": "2521296", "q": 6298, "v": 24889577.83 },
+      "03 - Procedimentos Clínicos": { "estab": "2436469", "q": 3220, "v": 6037796.32 },
+      "02 - Procedimentos com Finalidade Diagnóstica": { "estab": "2436469", "q": 34, "v": 60407.67 },
+      "05 - Transplantes de Órgãos, Tecidos e Células": { "estab": "2436469", "q": 156, "v": 1711302.30 }
     },
     "4.6": {
-      "02 - Procedimentos com Finalidade Diagnóstica": {
-        "estab": "2521296",
-        "q": 4559,
-        "v": 0
-      },
-      "03 - Procedimentos Clínicos": {
-        "estab": "2511754",
-        "q": 85,
-        "v": 0
-      }
+      "02 - Procedimentos com Finalidade Diagnóstica": { "estab": "2521296", "q": 4559, "v": 0 },
+      "03 - Procedimentos Clínicos": { "estab": "2511754", "q": 85, "v": 0 }
     }
   }
 };
 
-// 2. Altere esta linha para usar DADOS_PADRAO diretamente (removendo a leitura do localStorage):
 let bancoHistorico = JSON.parse(localStorage.getItem('digisus_historico_v3')) || DADOS_PADRAO;
 let grupoSelecionado = null;
-let registrosSIA = [];
-let registrosSIH = [];
+// Resultados já agregados (por seção) do último arquivo SIA/SIH lido no modal.
+// Ficam null até o usuário subir um arquivo nesta sessão do modal.
+let agregadoSIA = null;
+let agregadoSIH = null;
+let contagemSIA = 0;
+let contagemSIH = 0;
 
 function salvarStorage() { localStorage.setItem('digisus_historico_v3', JSON.stringify(bancoHistorico)); }
 function fmtN(v) { return Number(v || 0).toLocaleString('pt-BR'); }
@@ -749,8 +439,97 @@ function parseNum(val) {
   return isNaN(parsed) ? 0 : parsed;
 }
 
-function abrirModal() { document.getElementById('modalAdd').style.display = 'flex'; }
+function abrirModal() {
+  // reseta o estado do modal a cada abertura, pra não reaproveitar arquivo/registros de uma sessão anterior
+  agregadoSIA = null;
+  agregadoSIH = null;
+  contagemSIA = 0;
+  contagemSIH = 0;
+  ['fileSIA', 'fileSIH'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  ['msgSIA', 'msgSIH'].forEach(id => { const el = document.getElementById(id); if (el) el.innerText = ''; });
+  ['progressBgSIA', 'progressBgSIH'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+  document.getElementById('modalAdd').style.display = 'flex';
+  verificarQuadriExistente();
+}
 function fecharModal() { document.getElementById('modalAdd').style.display = 'none'; }
+
+// Checa se o Ano+Quadrimestre selecionado no modal já existe na série histórica.
+// Se existir, pré-carrega os valores de Atenção Básica (pra não perdê-los ao salvar)
+// e avisa o usuário que está em modo de edição.
+function verificarQuadriExistente() {
+  const ano = document.getElementById('modalAno').value;
+  const quadri = document.getElementById('modalQuadri').value;
+  const chave = `${quadri} ${ano}`;
+  const existente = bancoHistorico[chave];
+  const aviso = document.getElementById('avisoEdicao');
+
+  const ab = (existente && existente['4.1']) || {};
+  document.getElementById('abVisita').value = ab['Visita Domiciliar']?.q || 0;
+  document.getElementById('abIndiv').value = ab['Atendimento Individual']?.q || 0;
+  document.getElementById('abProc').value = ab['Procedimento']?.q || 0;
+  document.getElementById('abOdo').value = ab['Atendimento Odontológico']?.q || 0;
+
+  if (existente) {
+    aviso.style.display = 'block';
+    aviso.innerText = `✏️ "${chave}" já existe. Os valores de Atenção Básica acima foram carregados dos dados salvos. Se quiser atualizar SIA e/ou SIH, suba os arquivos abaixo — do contrário os dados atuais serão mantidos.`;
+  } else {
+    aviso.style.display = 'none';
+  }
+}
+
+// ---- Agregação de registros SIA/SIH em seções do painel ----
+
+function acumular(secao, grupo, estab, q, v) {
+  if (!secao[grupo]) secao[grupo] = { estabSet: new Set(), q: 0, v: 0 };
+  if (estab) secao[grupo].estabSet.add(estab);
+  secao[grupo].q += q;
+  secao[grupo].v += v;
+}
+
+function finalizarEstabs(secao) {
+  Object.keys(secao).forEach(g => {
+    const arr = Array.from(secao[g].estabSet).sort();
+    secao[g].estab = arr.length > 3 ? `${arr.length} estabelecimentos` : (arr.join(', ') || '-');
+    delete secao[g].estabSet;
+  });
+  return secao;
+}
+
+// A agregação de SIA/SIH acontece diretamente durante a leitura do arquivo (função lerDBF,
+// mais abaixo), registro por registro — evita guardar todos os registros na memória de
+// uma vez (o que causava "Out of Memory" em arquivos grandes, tipo o SIA de um quadrimestre
+// inteiro com quase 1 milhão de linhas). Regras de classificação aplicadas:
+//  SIA 4.2.1 (Urgência)             -> PA_CATEND === '02'
+//  SIA 4.4.1 (Especializada Geral)  -> todos os registros, sem filtro
+//  SIA 4.3.1 (Atenção Psicossocial) -> PA_PROC_ID começa com '030108' ou '030317'
+//  SIA 4.6   (Vigilância em Saúde)  -> PA_TPFIN === '07'
+//  SIH 4.2.2 (Urgência Hospitalar)  -> CAR_INT === '02'
+//  SIH 4.4.2 (Hospitalar Geral)     -> todos os registros, sem filtro (cada linha = 1 internação)
+
+// ---- Excluir Quadrimestre (modal) ----
+
+function abrirModalExcluir() {
+  const quadris = Object.keys(bancoHistorico || {});
+  if (quadris.length === 0) {
+    showToast("Nenhum quadrimestre disponível para remover.");
+    return;
+  }
+  const select = document.getElementById('selectExcluir');
+  select.innerHTML = quadris.map(q => `<option value="${q}">${q}</option>`).join('');
+  document.getElementById('modalExcluir').style.display = 'flex';
+}
+function fecharModalExcluir() { document.getElementById('modalExcluir').style.display = 'none'; }
+function confirmarExclusaoQuadrimestre() {
+  const chave = document.getElementById('selectExcluir').value;
+  if (!chave) return;
+  if (confirm(`Tem certeza que deseja apagar permanentemente todos os dados de "${chave}"? Essa ação não pode ser desfeita.`)) {
+    delete bancoHistorico[chave];
+    salvarStorage();
+    renderizarTudo();
+    fecharModalExcluir();
+    showToast(`Quadrimestre "${chave}" removido com sucesso!`);
+  }
+}
 
 function showToast(msg) {
   const container = document.getElementById('toastContainer');
@@ -769,7 +548,12 @@ function handleDrop(e, tipo) {
   if (e.dataTransfer.files.length > 0) lerDBF(e.dataTransfer.files[0], tipo);
 }
 
-async function parseDBFBufferAsync(buffer, onProgress) {
+// Lê um .DBF campo a campo e chama onRecord(row) imediatamente para cada registro,
+// sem nunca guardar a lista inteira de registros na memória. `camposNecessarios` (array
+// de nomes de campo) limita o que é decodificado por registro — evita o consumo de
+// memória de decodificar e guardar os ~60 campos de arquivos SIA/SIH quando só
+// precisamos de 4 a 6 deles. Retorna a contagem de registros não-deletados lidos.
+async function parseDBFStreamAsync(buffer, camposNecessarios, onRecord, onProgress) {
   const view = new DataView(buffer);
   const numRecords = view.getUint32(4, true);
   const headerLength = view.getUint16(8, true);
@@ -785,31 +569,34 @@ async function parseDBFBufferAsync(buffer, onProgress) {
     for (let i = 0; i < 11 && nameBytes[i] !== 0; i++) {
       name += String.fromCharCode(nameBytes[i]);
     }
-    const type = String.fromCharCode(view.getUint8(offset + 11));
     const length = view.getUint8(offset + 16);
-    fields.push({ name: name.trim().toUpperCase(), type, length });
+    fields.push({ name: name.trim().toUpperCase(), length });
     offset += 32;
   }
 
-  const records = [];
+  const wanted = camposNecessarios ? new Set(camposNecessarios) : null;
   let recordOffset = headerLength;
   const decoder = new TextDecoder('windows-1252');
   const CHUNK_SIZE = 5000;
+  let lidos = 0;
 
   for (let r = 0; r < numRecords; r++) {
     if (recordOffset + recordLength > buffer.byteLength) break;
-    
+
     const isDeleted = view.getUint8(recordOffset) === 0x2A;
     if (!isDeleted) {
       const row = {};
       let fieldOffset = recordOffset + 1;
       for (let f = 0; f < fields.length; f++) {
         const field = fields[f];
-        const bytes = new Uint8Array(buffer, fieldOffset, field.length);
-        row[field.name] = decoder.decode(bytes).trim();
+        if (!wanted || wanted.has(field.name)) {
+          const bytes = new Uint8Array(buffer, fieldOffset, field.length);
+          row[field.name] = decoder.decode(bytes).trim();
+        }
         fieldOffset += field.length;
       }
-      records.push(row);
+      onRecord(row);
+      lidos++;
     }
     recordOffset += recordLength;
 
@@ -820,7 +607,7 @@ async function parseDBFBufferAsync(buffer, onProgress) {
   }
 
   if (onProgress) onProgress(100);
-  return records;
+  return lidos;
 }
 
 async function lerDBF(file, tipo) {
@@ -837,17 +624,65 @@ async function lerDBF(file, tipo) {
 
   try {
     const buffer = await file.arrayBuffer();
-    const records = await parseDBFBufferAsync(buffer, (pct) => {
-      progressFill.style.width = `${pct}%`;
-      msgElement.innerText = `Processando registros: ${pct}%`;
-    });
 
-    if (tipo === 'sia') registrosSIA = records;
-    else registrosSIH = records;
+    if (tipo === 'sia') {
+      const sec421 = {}, sec431 = {}, sec441 = {}, sec46 = {};
+      const campos = ['PA_PROC_ID', 'PA_QTDAPR', 'PA_VALAPR', 'PA_CATEND', 'PA_TPFIN', 'PA_CODUNI'];
 
-    msgElement.style.color = '#68d391';
-    msgElement.innerText = `✓ ${fmtN(records.length)} registros lidos com sucesso!`;
-    showToast(`Arquivo ${file.name} (${fmtN(records.length)} lin.) carregado!`);
+      const lidos = await parseDBFStreamAsync(buffer, campos, (r) => {
+        const procId = r.PA_PROC_ID || '';
+        const grupo = procId.substring(0, 2);
+        const forma6 = procId.substring(0, 6);
+        const catend = r.PA_CATEND || '';
+        const tpfin = r.PA_TPFIN || '';
+        const estab = r.PA_CODUNI || '';
+        const q = parseNum(r.PA_QTDAPR);
+        const v = parseNum(r.PA_VALAPR);
+        const nomeGrupo = getNomeGrupoSIA(grupo);
+
+        acumular(sec441, nomeGrupo, estab, q, v);
+        if (catend === '02') acumular(sec421, nomeGrupo, estab, q, v);
+        if (forma6 === '030108' || forma6 === '030317') acumular(sec431, nomeGrupo, estab, q, v);
+        if (tpfin === '07') acumular(sec46, nomeGrupo, estab, q, v);
+      }, (pct) => {
+        progressFill.style.width = `${pct}%`;
+        msgElement.innerText = `Processando registros: ${pct}%`;
+      });
+
+      finalizarEstabs(sec421); finalizarEstabs(sec431); finalizarEstabs(sec441); finalizarEstabs(sec46);
+      agregadoSIA = { '4.2.1': sec421, '4.3.1': sec431, '4.4.1': sec441, '4.6': sec46 };
+      contagemSIA = lidos;
+
+      msgElement.style.color = '#68d391';
+      msgElement.innerText = `✓ ${fmtN(lidos)} registros processados com sucesso!`;
+      showToast(`Arquivo ${file.name} (${fmtN(lidos)} lin.) processado!`);
+    } else {
+      const sec422 = {}, sec442 = {};
+      const campos = ['PROC_REA', 'VAL_TOT', 'CAR_INT', 'CNES'];
+
+      const lidos = await parseDBFStreamAsync(buffer, campos, (r) => {
+        const proc = r.PROC_REA || '';
+        const grupo = proc.substring(0, 2);
+        const carint = r.CAR_INT || '';
+        const estab = r.CNES || '';
+        const v = parseNum(r.VAL_TOT);
+        const nomeGrupo = getNomeGrupoSIH(grupo);
+
+        acumular(sec442, nomeGrupo, estab, 1, v);
+        if (carint === '02') acumular(sec422, nomeGrupo, estab, 1, v);
+      }, (pct) => {
+        progressFill.style.width = `${pct}%`;
+        msgElement.innerText = `Processando registros: ${pct}%`;
+      });
+
+      finalizarEstabs(sec422); finalizarEstabs(sec442);
+      agregadoSIH = { '4.2.2': sec422, '4.4.2': sec442 };
+      contagemSIH = lidos;
+
+      msgElement.style.color = '#68d391';
+      msgElement.innerText = `✓ ${fmtN(lidos)} registros processados com sucesso!`;
+      showToast(`Arquivo ${file.name} (${fmtN(lidos)} lin.) processado!`);
+    }
   } catch (err) {
     msgElement.style.color = '#e53e3e';
     msgElement.innerText = "❌ Erro ao ler arquivo DBF: " + err.message;
@@ -878,13 +713,17 @@ function getNomeGrupoSIH(g) {
 }
 
 async function salvarQuadrimestreModal() {
+  const btnSalvar = document.querySelector('#modalAdd .btn-save');
   try {
-    const btnSalvar = document.querySelector('.modal-actions .btn-save');
     if (btnSalvar) btnSalvar.disabled = true;
 
     const ano = document.getElementById('modalAno').value;
     const quadri = document.getElementById('modalQuadri').value;
     const chave = `${quadri} ${ano}`;
+
+    // Se o quadrimestre já existe, parte dos dados salvos (pra preservar SIA/SIH
+    // caso o usuário só esteja atualizando um dos dois, ou só a Atenção Básica).
+    const existente = bancoHistorico[chave] || {};
 
     let novoQuadriData = {
       "4.1": {
@@ -893,144 +732,182 @@ async function salvarQuadrimestreModal() {
         "Procedimento": { "estab": "REDE UBS", "q": parseNum(document.getElementById('abProc').value), "v": 0 },
         "Visita Domiciliar": { "estab": "REDE UBS", "q": parseNum(document.getElementById('abVisita').value), "v": 0 }
       },
-      "4.2.1": {}, "4.2.2": {}, "4.3.1": {}, "4.4.1": {}, "4.4.2": {}, "4.6": {}
+      "4.2.1": (agregadoSIA && agregadoSIA['4.2.1']) || existente["4.2.1"] || {},
+      "4.2.2": (agregadoSIH && agregadoSIH['4.2.2']) || existente["4.2.2"] || {},
+      "4.3.1": (agregadoSIA && agregadoSIA['4.3.1']) || existente["4.3.1"] || {},
+      "4.4.1": (agregadoSIA && agregadoSIA['4.4.1']) || existente["4.4.1"] || {},
+      "4.4.2": (agregadoSIH && agregadoSIH['4.4.2']) || existente["4.4.2"] || {},
+      "4.6": (agregadoSIA && agregadoSIA['4.6']) || existente["4.6"] || {}
     };
 
-    const processarChunked = (array, fnProcessar, tamanhoLote = 25000) => {
-      return new Promise((resolve) => {
-        let index = 0;
-        function processarProximoLote() {
-          let fim = Math.min(index + tamanhoLote, array.length);
-          for (; index < fim; index++) {
-            fnProcessar(array[index]);
-          }
-          if (index < array.length) {
-            requestAnimationFrame(processarProximoLote);
-          } else {
-            resolve();
-          }
-        }
-        processarProximoLote();
-      });
-    };
+    const resumo = [];
 
-    // --- PROCESSAMENTO SIA ---
-if (Array.isArray(registrosSIA) && registrosSIA.length > 0) {
-  await processarChunked(registrosSIA, (r) => {
-    if (!r) return;
-    let PA_PROC = String(r.PA_PROC_ID || r.PA_PROCID || r.PA_PROC || r.PA_CODPROC || '').trim();
-    if (!PA_PROC || PA_PROC.length < 2) return;
-
-    // Lógica alinhada com TabWin: Frequência = PA_QTDAPR
-    let qtdVal = r.PA_QTDAPR !== undefined ? r.PA_QTDAPR : (r.PA_QTDPRO || 0);
-    let qtd = parseNum(qtdVal);
-
-    if (qtd <= 0) return;
-
-    let val = parseNum(r.PA_VALAPR !== undefined ? r.PA_VALAPR : (r.PA_VALPRO || 0));
-    let cnes = String(r.PA_CODUNI || r.CNES || 'GERAL').trim();
-
-    // Normaliza Caráter de Atendimento para 2 dígitos (ex: '2' -> '02')
-    let rawCarater = String(r.PA_CATEND ?? r.PA_CATE ?? r.PA_TPFREQ ?? r.PA_CONDIC ?? '').trim();
-    let caraterStr = rawCarater.padStart(2, '0');
-
-    let financ = String(r.PA_FINANC || r.PA_TPFIN || r.PA_CDFIN || '').trim();
-    let grupo = PA_PROC.substring(0, 2);
-    let nomeGrupo = getNomeGrupoSIA(grupo);
-
-    const acumular = (sec) => {
-      if (!novoQuadriData[sec][nomeGrupo]) {
-        novoQuadriData[sec][nomeGrupo] = { estab: cnes, q: 0, v: 0 };
-      }
-      novoQuadriData[sec][nomeGrupo].q += qtd;
-      novoQuadriData[sec][nomeGrupo].v += val;
-    };
-
-    // 1. Sempre acumula na tabela Produção Geral (4.4.1)
-    acumular("4.4.1");
-
-    // 2. Filtro 4.3.1 - Atenção Psicossocial
-    if (PA_PROC.startsWith("030108")) {
-      acumular("4.3.1");
+    if (agregadoSIA) {
+      resumo.push(`SIA: ${fmtN(contagemSIA)} registros processados`);
     }
-
-    // 3. Filtro 4.6 - Vigilância em Saúde
-    if (financ === '07' || financ === '7' || PA_PROC.startsWith("0104")) {
-      acumular("4.6");
+    if (agregadoSIH) {
+      resumo.push(`SIH: ${fmtN(contagemSIH)} registros processados`);
     }
-
-    // 4. Filtro 4.2.1 - Urgência Ambulatorial (Estritamente Caráter '02')
-    if (caraterStr === '02') {
-      acumular("4.2.1");
-    }
-  });
-}
-
-    // --- PROCESSAMENTO SIH ---
-if (Array.isArray(registrosSIH) && registrosSIH.length > 0) {
-  await processarChunked(registrosSIH, (r) => {
-    if (!r) return;
-    
-    // Procedimento Realizado no SIH
-    let PROC_REA = String(r.PROC_REA || r.PA_PROC_ID || r.PA_PROCID || r.PA_PROC || r.PROC_SOL || '').trim();
-    if (!PROC_REA || PROC_REA.length < 2) return;
-
-    // Frequência no SIH TabWin = 1 registro por AIH
-    let qtd = 1;
-
-    let val = parseNum(r.VAL_TOT || r.PA_VALAPR || r.PA_VALPRO || 0);
-    let cnes = String(r.CNES || r.PA_CODUNI || 'HOSPITAL').trim();
-    
-    // Normaliza Caráter de Internação para 2 dígitos ('02' = Urgência)
-    let rawCarInt = String(r.CAR_INT ?? r.PA_CATEND ?? '').trim();
-    let carIntStr = rawCarInt.padStart(2, '0');
-
-    let grupo = PROC_REA.substring(0, 2);
-    let nomeGrupo = getNomeGrupoSIH(grupo);
-
-    const acumularSIH = (sec) => {
-      if (!novoQuadriData[sec][nomeGrupo]) {
-        novoQuadriData[sec][nomeGrupo] = { estab: cnes, q: 0, v: 0 };
-      }
-      novoQuadriData[sec][nomeGrupo].q += qtd;
-      novoQuadriData[sec][nomeGrupo].v += val;
-    };
-
-    // 1. Acumula na Produção Geral Hospitalar (4.4.2)
-    acumularSIH("4.4.2");
-
-    // 2. Acumula na Urgência Hospitalar (4.2.2 - Estritamente Caráter '02')
-    if (carIntStr === '02') {
-      acumularSIH("4.2.2");
-    }
-  });
-}
 
     bancoHistorico[chave] = novoQuadriData;
     salvarStorage();
-    atualizarFiltrosEstaticos();
     renderizarTudo();
     fecharModal();
-    
-    registrosSIA = [];
-    registrosSIH = [];
 
+    const detalhe = resumo.length > 0 ? ` (${resumo.join(' | ')})` : '';
+    showToast(`Quadrimestre ${chave} salvo com sucesso!${detalhe}`);
+  } catch(e) {
+    showToast("Erro ao salvar quadrimestre: " + e.message);
+  } finally {
     if (btnSalvar) btnSalvar.disabled = false;
-    showToast(`Quadrimestre ${chave} salvo com sucesso!`);
-  } catch (err) {
-    console.error("Erro ao processar:", err);
-    alert("Erro ao processar registros: " + err.message);
+    agregadoSIA = null;
+    agregadoSIH = null;
+    contagemSIA = 0;
+    contagemSIH = 0;
   }
+}
+
+function renderizarTabelaEGraficos(tableId, secaoKey) {
+  const table = document.getElementById(tableId);
+  if (!table) return;
+
+  const metrica = document.getElementById('filtroMetrica').value;
+  const temQtd = metrica === 'Q' || metrica === 'AMBOS';
+  const temValor = metrica === 'V' || metrica === 'AMBOS';
+
+  const quadris = Object.keys(bancoHistorico || {});
+  if (quadris.length === 0) {
+    table.innerHTML = '';
+    return;
+  }
+
+  let colsPorQuadri = 0;
+  if (temQtd) colsPorQuadri++;
+  if (temValor) colsPorQuadri++;
+
+  let html = '<thead><tr><th rowspan="2">Item / Grupo</th>';
+  
+  quadris.forEach(q => {
+    html += `<th colspan="${colsPorQuadri}">${q}</th>`;
+  });
+  html += `<th colspan="${colsPorQuadri}">Total</th></tr><tr>`;
+  
+  quadris.forEach(() => {
+    if (temQtd) html += '<th>Qtd</th>';
+    if (temValor) html += '<th>Valor</th>';
+  });
+  if (temQtd) html += '<th>Qtd</th>';
+  if (temValor) html += '<th>Valor</th>';
+  html += '</tr></thead><tbody>';
+
+  // 1. Coleta todos os grupos existentes
+  let todosGruposSet = new Set();
+  quadris.forEach(q => {
+    if (bancoHistorico[q] && bancoHistorico[q][secaoKey]) {
+      Object.keys(bancoHistorico[q][secaoKey]).forEach(g => todosGruposSet.add(g));
+    }
+  });
+
+  // 2. Ordena os grupos em ordem alfabética/numérica crescente (01, 02, 03, 04...)
+  let todosGrupos = Array.from(todosGruposSet).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+
+  let totaisColunas = {};
+  quadris.forEach(q => {
+    totaisColunas[q] = { q: 0, v: 0 };
+  });
+  let totalGeralQtd = 0;
+  let totalGeralValor = 0;
+
+  // 3. Monta as linhas na ordem correta
+  todosGrupos.forEach(grupo => {
+    html += `<tr><td><strong>${grupo}</strong></td>`;
+    let linQ = 0, linV = 0;
+
+    quadris.forEach(q => {
+      let d = (bancoHistorico[q] && bancoHistorico[q][secaoKey] && bancoHistorico[q][secaoKey][grupo]) || { q: 0, v: 0 };
+      linQ += d.q;
+      linV += d.v;
+
+      totaisColunas[q].q += d.q;
+      totaisColunas[q].v += d.v;
+
+      if (temQtd) html += `<td>${fmtN(d.q)}</td>`;
+      if (temValor) html += `<td>${fmtM(d.v)}</td>`;
+    });
+
+    totalGeralQtd += linQ;
+    totalGeralValor += linV;
+
+    if (temQtd) html += `<td><strong>${fmtN(linQ)}</strong></td>`;
+    if (temValor) html += `<td><strong>${fmtM(linV)}</strong></td>`;
+    html += '</tr>';
+  });
+
+  html += '</tbody>';
+
+  // 4. Linha de Total no rodapé
+  if (todosGrupos.length > 0) {
+    html += '<tfoot><tr>';
+    html += '<td>TOTAL</td>';
+
+    quadris.forEach(q => {
+      if (temQtd) html += `<td>${fmtN(totaisColunas[q].q)}</td>`;
+      if (temValor) html += `<td>${fmtM(totaisColunas[q].v)}</td>`;
+    });
+
+    if (temQtd) html += `<td>${fmtN(totalGeralQtd)}</td>`;
+    if (temValor) html += `<td>${fmtM(totalGeralValor)}</td>`;
+    html += '</tr></tfoot>';
+  }
+
+  table.innerHTML = html;
+}
+
+function calcularKPIs() {
+  let totalQ = 0;
+  let totalV = 0;
+  let abQ = 0;
+  let sihV = 0;
+
+  Object.keys(bancoHistorico).forEach(q => {
+    const quadri = bancoHistorico[q];
+    Object.keys(quadri).forEach(secao => {
+      Object.keys(quadri[secao]).forEach(grupo => {
+        const item = quadri[secao][grupo];
+        totalQ += item.q || 0;
+        totalV += item.v || 0;
+
+        if (secao === '4.1') abQ += item.q || 0;
+        if (secao === '4.2.2' || secao === '4.4.2') sihV += item.v || 0;
+      });
+    });
+  });
+
+  document.getElementById('kpiTotalQ').innerText = fmtN(totalQ);
+  document.getElementById('kpiTotalV').innerText = fmtM(totalV);
+  document.getElementById('kpiABQ').innerText = fmtN(abQ);
+  document.getElementById('kpiSIHV').innerText = fmtM(sihV);
+}
+
+function renderizarTudo() {
+  calcularKPIs();
+  renderizarTabelaEGraficos('tb41', '4.1');
+  renderizarTabelaEGraficos('tb421', '4.2.1');
+  renderizarTabelaEGraficos('tb422', '4.2.2');
+  renderizarTabelaEGraficos('tb431', '4.3.1');
+  renderizarTabelaEGraficos('tb441', '4.4.1');
+  renderizarTabelaEGraficos('tb442', '4.4.2');
+  renderizarTabelaEGraficos('tb46', '4.6');
 }
 
 function exportarJSON() {
   const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(bancoHistorico, null, 2));
-  const link = document.createElement('a');
-  link.setAttribute("href", dataStr);
-  link.setAttribute("download", "historico_digisus.json");
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
+  const downloadAnchor = document.createElement('a');
+  downloadAnchor.setAttribute("href", dataStr);
+  downloadAnchor.setAttribute("download", `digisus_dados_${new Date().toISOString().slice(0,10)}.json`);
+  document.body.appendChild(downloadAnchor);
+  downloadAnchor.click();
+  downloadAnchor.remove();
 }
 
 function importarJSON(e) {
@@ -1041,30 +918,22 @@ function importarJSON(e) {
     try {
       bancoHistorico = JSON.parse(evt.target.result);
       salvarStorage();
-      atualizarFiltrosEstaticos();
       renderizarTudo();
-      showToast("Base JSON importada!");
+      showToast("Dados importados com sucesso!");
     } catch(err) {
-      alert("Erro ao importar o arquivo JSON fornecido.");
+      showToast("Erro ao importar JSON: " + err.message);
     }
   };
   reader.readAsText(file);
 }
 
 function limparBancoData() {
-  if (confirm("Confirma a restauração e limpeza completa da base de dados local?")) {
-    localStorage.removeItem('digisus_historico_v3');
-    bancoHistorico = {};
-    atualizarFiltrosEstaticos();
+  if (confirm("Tem certeza que deseja redefinir os dados para o padrão?")) {
+    bancoHistorico = JSON.parse(JSON.stringify(DADOS_PADRAO));
+    salvarStorage();
     renderizarTudo();
-    showToast("Base de dados zerada com sucesso!");
+    showToast("Dados redefinidos!");
   }
-}
-
-function selecionarGrupo(nomeGrupo) {
-  grupoSelecionado = (grupoSelecionado === nomeGrupo) ? null : nomeGrupo;
-  document.getElementById('btnLimparGrupo').style.display = grupoSelecionado ? 'block' : 'none';
-  renderizarTudo();
 }
 
 function limparFiltroGrupo() {
@@ -1073,169 +942,10 @@ function limparFiltroGrupo() {
   renderizarTudo();
 }
 
-function calcularKPIs() {
-  const anoFiltro = document.getElementById('filtroAno').value;
-  const quadriFiltro = document.getElementById('filtroQuadrimestre').value;
-  const estabFiltro = document.getElementById('filtroEstabelecimento').value;
-
-  let totalQ = 0, totalV = 0, abQ = 0, sihV = 0;
-
-  Object.keys(bancoHistorico).forEach(p => {
-    if ((anoFiltro === 'TODOS' || p.endsWith(anoFiltro)) && (quadriFiltro === 'TODOS' || p.startsWith(quadriFiltro))) {
-      Object.keys(bancoHistorico[p]).forEach(secao => {
-        Object.keys(bancoHistorico[p][secao]).forEach(item => {
-          const d = bancoHistorico[p][secao][item];
-          if (estabFiltro === 'TODOS' || d.estab === estabFiltro) {
-            totalQ += d.q;
-            totalV += d.v;
-            if (secao === '4.1') abQ += d.q;
-            if (secao === '4.2.2' || secao === '4.4.2') sihV += d.v;
-          }
-        });
-      });
-    }
-  });
-
-  document.getElementById('kpiTotalQ').innerText = fmtN(totalQ);
-  document.getElementById('kpiTotalV').innerText = fmtM(totalV);
-  document.getElementById('kpiABQ').innerText = fmtN(abQ);
-  document.getElementById('kpiSIHV').innerText = fmtM(sihV);
-}
-
-function atualizarFiltrosEstaticos() {
-  const estabs = new Set();
-  const anos = new Set();
-
-  Object.keys(bancoHistorico).forEach(p => {
-    const partes = p.split(' ');
-    if (partes.length > 1) anos.add(partes[partes.length - 1]);
-    Object.keys(bancoHistorico[p]).forEach(sec => {
-      Object.keys(bancoHistorico[p][sec]).forEach(item => {
-        if (bancoHistorico[p][sec][item].estab) estabs.add(bancoHistorico[p][sec][item].estab);
-      });
-    });
-  });
-
-  const selE = document.getElementById('filtroEstabelecimento');
-  const selA = document.getElementById('filtroAno');
-  
-  selE.innerHTML = '<option value="TODOS">Todos os Estabelecimentos</option>';
-  estabs.forEach(e => selE.innerHTML += `<option value="${e}">${e}</option>`);
-
-  selA.innerHTML = '<option value="TODOS">Todos os Anos</option>';
-  anos.forEach(a => selA.innerHTML += `<option value="${a}">${a}</option>`);
-}
-
-function renderizarTabelaEGráficos(tabelaId, chaveSecao, temValor = true) {
-  const table = document.getElementById(tabelaId);
-  if (!table) return;
-
-  const anoFiltro = document.getElementById('filtroAno').value;
-  const quadriFiltro = document.getElementById('filtroQuadrimestre').value;
-  const estabFiltro = document.getElementById('filtroEstabelecimento').value;
-  const modoMetrica = document.getElementById('filtroMetrica').value;
-
-  const periodos = Object.keys(bancoHistorico).filter(p => {
-    return (anoFiltro === 'TODOS' || p.endsWith(anoFiltro)) && (quadriFiltro === 'TODOS' || p.startsWith(quadriFiltro));
-  }).sort();
-
-  const linhasSet = new Set();
-  periodos.forEach(p => {
-    if (bancoHistorico[p] && bancoHistorico[p][chaveSecao]) {
-      Object.keys(bancoHistorico[p][chaveSecao]).forEach(l => {
-        const item = bancoHistorico[p][chaveSecao][l];
-        if (estabFiltro === 'TODOS' || item.estab === estabFiltro) {
-          linhasSet.add(l);
-        }
-      });
-    }
-  });
-
-  const linhas = Array.from(linhasSet).sort();
-
-  let headHTML = `<tr><th>Item / Grupo</th>`;
-  periodos.forEach(p => headHTML += (modoMetrica === 'AMBOS' && temValor) ? `<th colspan="2" style="text-align:center">${p}</th>` : `<th>${p}</th>`);
-  headHTML += (modoMetrica === 'AMBOS' && temValor) ? `<th colspan="2" style="text-align:center">Total</th></tr>` : `<th>Total</th></tr>`;
-
-  if (modoMetrica === 'AMBOS' && temValor) {
-    headHTML += `<tr><th></th>`;
-    periodos.forEach(() => headHTML += `<th>Qtd</th><th>Valor</th>`);
-    headHTML += `<th>Qtd</th><th>Valor</th></tr>`;
-  }
-
-  const thead = table.querySelector('thead');
-  const tbody = table.querySelector('tbody');
-
-  if (thead) thead.innerHTML = headHTML;
-
-  let bodyHTML = "";
-  linhas.forEach(linha => {
-    if (grupoSelecionado && grupoSelecionado !== linha) return;
-    let rowClass = (grupoSelecionado === linha) ? "selected-row" : "";
-    bodyHTML += `<tr class="clickable-row ${rowClass}" onclick="selecionarGrupo('${linha}')"><td><b>${linha}</b></td>`;
-    let rowQ = 0, rowV = 0;
-
-    periodos.forEach(p => {
-      const d = (bancoHistorico[p] && bancoHistorico[p][chaveSecao] && bancoHistorico[p][chaveSecao][linha]) ? bancoHistorico[p][chaveSecao][linha] : { q: 0, v: 0 };
-      rowQ += d.q; rowV += d.v;
-
-      if (modoMetrica === 'Q') bodyHTML += `<td>${fmtN(d.q)}</td>`;
-      else if (modoMetrica === 'V') bodyHTML += `<td>${fmtM(d.v)}</td>`;
-      else { bodyHTML += `<td>${fmtN(d.q)}</td>`; if (temValor) bodyHTML += `<td>${fmtM(d.v)}</td>`; }
-    });
-
-    if (modoMetrica === 'Q') bodyHTML += `<td><b>${fmtN(rowQ)}</b></td>`;
-    else if (modoMetrica === 'V') bodyHTML += `<td><b>${fmtM(rowV)}</b></td>`;
-    else { bodyHTML += `<td><b>${fmtN(rowQ)}</b></td>`; if (temValor) bodyHTML += `<td><b>${fmtM(rowV)}</b></td>`; }
-    bodyHTML += `</tr>`;
-  });
-
-  if (tbody) tbody.innerHTML = bodyHTML;
-}
-
-function renderizarTudo() {
-  calcularKPIs();
-  renderizarTabelaEGráficos('tb41', '4.1', false);
-  renderizarTabelaEGráficos('tb421', '4.2.1', true);
-  renderizarTabelaEGráficos('tb422', '4.2.2', true);
-  renderizarTabelaEGráficos('tb431', '4.3.1', true);
-  renderizarTabelaEGráficos('tb441', '4.4.1', true);
-  renderizarTabelaEGráficos('tb442', '4.4.2', true);
-  renderizarTabelaEGráficos('tb46', '4.6', true);
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  atualizarFiltrosEstaticos();
+window.onload = function() {
   renderizarTudo();
-});
-  // Oculta os botões de ação apenas no ambiente publicado (GitHub Pages)
-window.addEventListener('DOMContentLoaded', () => {
-  const isOnline = window.location.hostname.includes('github.io');
-  
-  if (isOnline) {
-    // Busca o contêiner onde ficam os botões no cabeçalho e oculta
-    const acoesHeader = document.querySelector('.header-actions') || 
-                        document.querySelector('.actions') || 
-                        document.querySelector('.top-buttons');
-                        
-    if (acoesHeader) {
-      acoesHeader.style.display = 'none';
-    } else {
-      // Caso os botões não estejam num container agrupado, oculta individualmente pelas funções chamadas:
-      document.querySelectorAll('button').forEach(btn => {
-        const onclickAttr = btn.getAttribute('onclick') || '';
-        if (
-          onclickAttr.includes('abrirModal') || 
-          onclickAttr.includes('exportarJSON') || 
-          onclickAttr.includes('importarJSON') || 
-          onclickAttr.includes('limpar')
-        ) {
-          btn.style.display = 'none';
-        }
-      });
-    }
-  }
-});
+};
 </script>
+
 </body>
 </html>

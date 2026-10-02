@@ -96,7 +96,7 @@ const t5=(t,p,k)=>`<div class="c"><h3>${t}</h3><div class="cv" style="height:200
 function skel(p,sia){const nm2=sia?'SIA — Sistema de Informações Ambulatoriais':'SIH — Sistema de Informações Hospitalares';
 $('#p-'+p).innerHTML=`<div class="band">${nm2}<small>${sia?'Quantidade e valor aprovados':'AIHs pagas e valor total'}</small></div>
 <div class="g k" id="${p}-k"></div>
-<div class="c dst" style="margin-bottom:14px"><h3>Destaques para a decisão</h3><div id="${p}-d"></div></div>
+<div class="c dst" style="margin-bottom:14px"><h3>Destaques</h3><div id="${p}-d"></div></div>
 <div class="c" style="margin-bottom:14px"><h3>Capítulo 4 do DigiSUS — Dados de produção de serviços no SUS</h3><div class="pills" id="${p}-pl"></div>
 <div class="g g2" style="margin:0"><div class="sc" id="${p}-cap"></div><div class="cv"><div id="${p}-capc" style="height:100%"></div></div></div><div class="note" id="${p}-capn"></div></div>
 <div class="g g2">${cv('Evolução mensal — valor (R$)',p+'-ev')}${cv('Participação por grupo de procedimento (valor)',p+'-gr')}</div>
